@@ -1,5 +1,13 @@
 Mimopay Android SDK release notes
 ================================
+1.2
+-----
+* Bug fixes
+* Now supoort XL, airtime and voucher
+* Introduce new error, ErrorHTTP404NotFound, error return 404
+* entities-base.properties and entities-full.properties problem solution added
+* Encrypted secretKey is now provided
+
 1.1
 -----
 * Bug fixes

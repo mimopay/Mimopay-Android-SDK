@@ -38,6 +38,9 @@ import java.util.ArrayList;
 // mimopay
 import com.mimopay.Mimopay;
 import com.mimopay.MimopayInterface;
+import com.mimopay.merchant.Merchant;
+
+import javax.crypto.Cipher;
 
 public class AndroidOgreMesh extends Activity
 {
@@ -50,6 +53,9 @@ public class AndroidOgreMesh extends Activity
 	boolean bsevelin;
 	boolean batmbca;
 	boolean bupoint;
+	boolean bxl;
+	boolean bxlairtime;
+	boolean bxlhrn;
 
     /** Called when the activity is first created. */
     @Override
@@ -69,6 +75,9 @@ public class AndroidOgreMesh extends Activity
 				bsevelin = userDetails.getBoolean("sevelin", false);
 				batmbca = userDetails.getBoolean("atmbca", false);
 				bupoint = userDetails.getBoolean("upoint", false);
+				bxl = userDetails.getBoolean("xl", false);
+				bxlairtime = userDetails.getBoolean("xlairtime", false);
+				bxlhrn = userDetails.getBoolean("xlhrn", false);
 				mGLView = new ClearGLSurfaceView(this);
 				setContentView(mGLView);
 			} else {
@@ -146,6 +155,33 @@ public class AndroidOgreMesh extends Activity
             cbUPoint.setText("U-Point");
             mainlayout.addView(cbUPoint);
 
+            final CheckBox cbXL = new CheckBox(this);
+            cbXL.setId(++id);
+			RelativeLayout.LayoutParams cbXLLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			cbXLLp.addRule(RelativeLayout.BELOW, id-1);
+			//cbXLLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			cbXL.setLayoutParams(cbXLLp);
+            cbXL.setText("XL");
+            mainlayout.addView(cbXL);
+
+            final CheckBox cbXLAirtime = new CheckBox(this);
+            cbXLAirtime.setId(++id);
+			RelativeLayout.LayoutParams cbXLAirtimeLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			cbXLAirtimeLp.addRule(RelativeLayout.BELOW, id-1);
+			//cbXLAirtimeLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			cbXLAirtime.setLayoutParams(cbXLAirtimeLp);
+            cbXLAirtime.setText("XL Airtime");
+            mainlayout.addView(cbXLAirtime);
+
+            final CheckBox cbXLHrn = new CheckBox(this);
+            cbXLHrn.setId(++id);
+			RelativeLayout.LayoutParams cbXLHrnLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			cbXLHrnLp.addRule(RelativeLayout.BELOW, id-1);
+			//cbXLHrnLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			cbXLHrn.setLayoutParams(cbXLHrnLp);
+            cbXLHrn.setText("XL HRN");
+            mainlayout.addView(cbXLHrn);
+
 			Button btch = new Button(this);
             btch.setId(++id);
 			RelativeLayout.LayoutParams btchlp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -159,7 +195,10 @@ public class AndroidOgreMesh extends Activity
 					boolean bsevelin = cbSevelin.isChecked();
 					boolean batmbca = cbAtmBca.isChecked();
 					boolean bupoint = cbUPoint.isChecked();
-					if(!btopup && !bsmartfren && !bsevelin && !batmbca && !bupoint) {
+					boolean bxl = cbXL.isChecked();
+					boolean bxlairtime = cbXLAirtime.isChecked();
+					boolean bxlhrn = cbXLHrn.isChecked();
+					if(!btopup && !bsmartfren && !bsevelin && !batmbca && !bupoint && !bxl && !bxlairtime && !bxlhrn) {
 						Toast.makeText(getApplicationContext(), "You must checked at least one!", Toast.LENGTH_LONG).show();
 					} else {
 						SharedPreferences userDetails = PreferenceManager.getDefaultSharedPreferences(AndroidOgreMesh.this);
@@ -171,6 +210,9 @@ public class AndroidOgreMesh extends Activity
 						edit.putBoolean("sevelin", cbSevelin.isChecked());
 						edit.putBoolean("atmbca", cbAtmBca.isChecked());
 						edit.putBoolean("upoint", cbUPoint.isChecked());
+						edit.putBoolean("xl", cbXL.isChecked());
+						edit.putBoolean("xlairtime", cbXLAirtime.isChecked());
+						edit.putBoolean("xlhrn", cbXLHrn.isChecked());
 						edit.commit();
 						finish();
 					}
@@ -219,7 +261,19 @@ public class AndroidOgreMesh extends Activity
 			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
 		} //`
 		if(bupoint) { //`
-		    menu.add(0, ++id, 0, "U-Point");
+		    menu.add(0, ++id, 0, "UPoint");
+			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
+		} //`
+		if(bxl) { //`
+		    menu.add(0, ++id, 0, "XL");
+			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
+		} //`
+		if(bxlairtime) { //`
+		    menu.add(0, ++id, 0, "XL Airtime");
+			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
+		} //`
+		if(bxlhrn) { //`
+		    menu.add(0, ++id, 0, "XL HRN");
 			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
 		} //`
 		menu.add(0, ++id, 0, "Last Result");
@@ -232,7 +286,10 @@ public class AndroidOgreMesh extends Activity
 	private final int TOPUP_SEVELIN = 3;
 	private final int TOPUP_ATMBCA = 4;
 	private final int AIRTIME_UPOINT = 5;
-	private final int LAST_RESULT = 6;
+	private final int XL = 6;
+	private final int XL_AIRTIME = 7;
+	private final int XL_HRN = 8;
+	private final int LAST_RESULT = 9;
 
     @Override public boolean onOptionsItemSelected(MenuItem item) 
 	{
@@ -247,8 +304,14 @@ public class AndroidOgreMesh extends Activity
 				initMimopay(TOPUP_SEVELIN);
 			} else if(s.equals("ATM BCA")) {
 				initMimopay(TOPUP_ATMBCA);
-			} else if(s.equals("U-Point")) {
+			} else if(s.equals("UPoint")) {
 				initMimopay(AIRTIME_UPOINT);
+			} else if(s.equals("XL")) {
+				initMimopay(XL);
+			} else if(s.equals("XL Airtime")) {
+				initMimopay(XL_AIRTIME);
+			} else if(s.equals("XL HRN")) {
+				initMimopay(XL_HRN);
 			} else if(s.equals("Last Result")) {
 				initMimopay(LAST_RESULT);
 			} else {
@@ -260,7 +323,6 @@ public class AndroidOgreMesh extends Activity
 		return true;
     }
 
-//jim
 	boolean mQuietMode = false;
 	Mimopay mMimopay = null;
 	MimopayInterface mMimopayInterface = new MimopayInterface()
@@ -290,20 +352,32 @@ public class AndroidOgreMesh extends Activity
 
 	void initMimopay(int paymentid)
 	{
-		String emailOrUserId = "YourEmailOrUserId";
-		String merchantCode = "YourMerchantCode";
-		String productName = "YourProductName";
+		String emailOrUserId = "1385479814";
+		String merchantCode = "ID-0031";
+		String productName = "ID-0031-0001";
 		String transactionId = "";	// leave it empty, let the library generate it (unix timestamp)
-		String secretKey = "YourSecretKey";
+		//String secretKey = "mimo.1234&";
+		String secretKeyStaging = null;
+		String secretKeyGateway = null;
+		try {
+			secretKeyStaging = Merchant.get(true, "b/12DESqaQr9YUMugYz1sg==");
+			secretKeyGateway = Merchant.get(false, "eWo/i4YCvUfpg1Cq5yrpng==");
+		} catch(Exception e) { jprintf("e: " + e.toString()); }
 		String currency = "IDR";
+		
+		if(secretKeyStaging == null || secretKeyGateway == null) {
+			Toast.makeText(getApplicationContext(), "secretKey problem!", Toast.LENGTH_LONG).show();
+			return;
+		}
 
 		mMimopay = new Mimopay(getApplicationContext(), emailOrUserId,
-			merchantCode, productName, transactionId, secretKey, currency, mMimopayInterface);
+			merchantCode, productName, transactionId, secretKeyStaging, secretKeyGateway, currency, mMimopayInterface);
 
-		//mMimopay.enableLog(true);
-		
 		AlertDialog.Builder altbld = null;
 		AlertDialog alert = null;
+		
+		mMimopay.enableLog(true);
+		//mMimopay.enableGateway(true);
 
         switch (paymentid)
 		{
@@ -316,7 +390,7 @@ public class AndroidOgreMesh extends Activity
 				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
 				"You may change it later in this sample source code.\n" +
 				"Now, please choose which one.")
-			.setCancelable(false)
+			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = false;
 				mMimopay.executeTopup("smartfren");
@@ -336,7 +410,7 @@ public class AndroidOgreMesh extends Activity
 				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
 				"You may change it later in this sample source code.\n" +
 				"Now, please choose which one.")
-			.setCancelable(false)
+			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = false;
 				mMimopay.executeTopup("sevelin");
@@ -356,7 +430,7 @@ public class AndroidOgreMesh extends Activity
 				"In Quiet Mode, the value of mimocard is currently set to 50K. " +
 				"You may change it later in this sample source code.\n" +
 				"Now, please choose which one.")
-			.setCancelable(false)
+			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = false;
 				mMimopay.executeTopup("atm_bca");
@@ -376,7 +450,7 @@ public class AndroidOgreMesh extends Activity
 				"In Quiet Mode, the UPoint credits is currently set to 1000 and phone number is 082114078308. " +
 				"You may change them later in this sample source code.\n" +
 				"Now, please choose which one.")
-			.setCancelable(false)
+			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = false;
 				mMimopay.executeUPointAirtime();
@@ -387,6 +461,50 @@ public class AndroidOgreMesh extends Activity
 			}});
 			alert = altbld.create();
 			alert.setTitle("UPoint Airtime");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case XL: // XL
+			mMimopay.executeXL();
+			break;
+        case XL_AIRTIME: // XL Airtime
+			altbld = new AlertDialog.Builder(AndroidOgreMesh.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the XL Airtime credits is currently set to 10000 and phone number is 087771270843. " +
+				"You may change them later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = false;
+				mMimopay.executeXLAirtime();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeXLAirtime("10000", "087771270843", false);
+				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
+			}});
+			alert = altbld.create();
+			alert.setTitle("XL Airtime");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case XL_HRN: // XL HRN
+			altbld = new AlertDialog.Builder(AndroidOgreMesh.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the voucher number (HRN) is currently set to 1234567890123456. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = false;
+				mMimopay.executeXLHrn();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeXLHrn("1234567890123456");
+			}});
+			alert = altbld.create();
+			alert.setTitle("XL HRN");
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;
