@@ -356,7 +356,6 @@ public class AndroidOgreMesh extends Activity
 		String merchantCode = "ID-0031";
 		String productName = "ID-0031-0001";
 		String transactionId = "";	// leave it empty, let the library generate it (unix timestamp)
-		//String secretKey = "mimo.1234&";
 		String secretKeyStaging = null;
 		String secretKeyGateway = null;
 		try {
