@@ -1,5 +1,9 @@
 Mimopay Android SDK release notes
 ================================
+1.2.2
+------
+* add scrollable to all UI Forms
+
 1.2.1
 ------
 * fix bug when SDK running without storage (sdcard). all logos replaced by text
