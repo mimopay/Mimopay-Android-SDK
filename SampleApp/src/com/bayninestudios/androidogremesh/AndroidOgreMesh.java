@@ -359,8 +359,8 @@ public class AndroidOgreMesh extends Activity
 		String secretKeyStaging = null;
 		String secretKeyGateway = null;
 		try {
-			secretKeyStaging = Merchant.get(true, "b/12DESqaQr9YUMugYz1sg==");
-			secretKeyGateway = Merchant.get(false, "eWo/i4YCvUfpg1Cq5yrpng==");
+			secretKeyStaging = Merchant.get(true, "zLdLLbLX7xi2E4zxcbGMPg==");
+			secretKeyGateway = Merchant.get(false, "5aSkczdhkk4ukFsZEHykkA==");
 		} catch(Exception e) { jprintf("e: " + e.toString()); }
 		String currency = "IDR";
 		
@@ -432,11 +432,13 @@ public class AndroidOgreMesh extends Activity
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = false;
-				mMimopay.executeTopup("atm_bca");
+				//mMimopay.executeTopup("atm_bca");
+				mMimopay.executeATMs();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeTopup("atm_bca", "50000");
+				//mMimopay.executeTopup("atm_bca", "50000");
+				jprintf("Not yet implemented");
 			}});
 			alert = altbld.create();
 			alert.setTitle("ATM BCA Topup");

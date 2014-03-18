@@ -1,5 +1,9 @@
 Mimopay Android SDK release notes
 ================================
+1.2.3
+------
+* fix next button, when some denominations are overlap screen size
+
 1.2.2
 ------
 * add scrollable to all UI Forms
