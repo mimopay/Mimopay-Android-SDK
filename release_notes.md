@@ -1,5 +1,11 @@
 Mimopay Android SDK release notes
 ================================
+
+1.2.4
+------
+* fix BadTokenException problem
+* ATM is now supported, but UI mode only at the moment
+
 1.2.3
 ------
 * fix next button, when some denominations are overlap screen size
