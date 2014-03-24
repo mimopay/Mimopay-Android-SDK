@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+1.2.6
+------
+* ATMs (BCA & Bersama) Quiet Mode is now supported
+
 1.2.5
 ------
 * UI improved

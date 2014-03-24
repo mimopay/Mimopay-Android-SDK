@@ -51,7 +51,9 @@ public class AndroidOgreMesh extends Activity
 	boolean btopup;
 	boolean bsmartfren;
 	boolean bsevelin;
+	boolean batm;
 	boolean batmbca;
+	boolean batmbersama;
 	boolean bupoint;
 	boolean bxl;
 	boolean bxlairtime;
@@ -73,7 +75,9 @@ public class AndroidOgreMesh extends Activity
 				btopup = userDetails.getBoolean("topup", false);
 				bsmartfren = userDetails.getBoolean("smartfren", false);
 				bsevelin = userDetails.getBoolean("sevelin", false);
+				batm = userDetails.getBoolean("atm", false);
 				batmbca = userDetails.getBoolean("atmbca", false);
+				batmbersama = userDetails.getBoolean("atmbersama", false);
 				bupoint = userDetails.getBoolean("upoint", false);
 				bxl = userDetails.getBoolean("xl", false);
 				bxlairtime = userDetails.getBoolean("xlairtime", false);
@@ -109,10 +113,12 @@ public class AndroidOgreMesh extends Activity
         RelativeLayout mainlayout = new RelativeLayout(this); //`
 
 			int id = 0;
+			int topid;
 
             final CheckBox cbMainTopup = new CheckBox(this);
             cbMainTopup.setId(++id);
-			RelativeLayout.LayoutParams cbMainTopupLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			topid = id;
+			RelativeLayout.LayoutParams cbMainTopupLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			//cbMainTopupLp.addRule(RelativeLayout.BELOW, id-1);
 			//cbMainTopupLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbMainTopup.setLayoutParams(cbMainTopupLp);
@@ -121,8 +127,10 @@ public class AndroidOgreMesh extends Activity
 
             final CheckBox cbSmartfren = new CheckBox(this);
             cbSmartfren.setId(++id);
-			RelativeLayout.LayoutParams cbSmartfrenLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbSmartfrenLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbSmartfrenLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbSmartfrenLp.addRule(RelativeLayout.RIGHT_OF, id-1);
+			cbSmartfrenLp.addRule(RelativeLayout.ALIGN_TOP, topid);
+			//cbSmartfrenLp.addRule(RelativeLayout.BELOW, id-1);
 			//cbSmartfrenLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbSmartfren.setLayoutParams(cbSmartfrenLp);
             cbSmartfren.setText("Smartfren");
@@ -130,44 +138,74 @@ public class AndroidOgreMesh extends Activity
 
             final CheckBox cbSevelin = new CheckBox(this);
             cbSevelin.setId(++id);
-			RelativeLayout.LayoutParams cbSevelinLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbSevelinLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbSevelinLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbSevelinLp.addRule(RelativeLayout.RIGHT_OF, id-1);
+			cbSevelinLp.addRule(RelativeLayout.ALIGN_TOP, topid);
+			//cbSevelinLp.addRule(RelativeLayout.BELOW, id-1);
 			//cbSevelinLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbSevelin.setLayoutParams(cbSevelinLp);
             cbSevelin.setText("Sevelin");
             mainlayout.addView(cbSevelin);
 
+            final CheckBox cbAtm = new CheckBox(this);
+            cbAtm.setId(++id);
+			RelativeLayout.LayoutParams cbAtmLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbAtmLp.addRule(RelativeLayout.BELOW, topid);
+			//cbAtmLp.addRule(RelativeLayout.BELOW, id-1);
+			//cbAtmLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			cbAtm.setLayoutParams(cbAtmLp);
+            cbAtm.setText("ATM");
+            mainlayout.addView(cbAtm);
+			topid = id;
+
             final CheckBox cbAtmBca = new CheckBox(this);
             cbAtmBca.setId(++id);
-			RelativeLayout.LayoutParams cbAtmBcaLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbAtmBcaLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbAtmBcaLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbAtmBcaLp.addRule(RelativeLayout.RIGHT_OF, id-1);
+			cbAtmBcaLp.addRule(RelativeLayout.ALIGN_TOP, topid);
+			//cbAtmBcaLp.addRule(RelativeLayout.BELOW, id-1);
 			//cbAtmBcaLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbAtmBca.setLayoutParams(cbAtmBcaLp);
-            cbAtmBca.setText("ATM BCA");
+            cbAtmBca.setText("BCA");
             mainlayout.addView(cbAtmBca);
+
+            final CheckBox cbAtmBersama = new CheckBox(this);
+            cbAtmBersama.setId(++id);
+			RelativeLayout.LayoutParams cbAtmBersamaLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbAtmBersamaLp.addRule(RelativeLayout.RIGHT_OF, id-1);
+			cbAtmBersamaLp.addRule(RelativeLayout.ALIGN_TOP, topid);
+			//cbAtmBersamaLp.addRule(RelativeLayout.BELOW, id-1);
+			//cbAtmBersamaLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			cbAtmBersama.setLayoutParams(cbAtmBersamaLp);
+            cbAtmBersama.setText("Bersama");
+            mainlayout.addView(cbAtmBersama);
 
             final CheckBox cbUPoint = new CheckBox(this);
             cbUPoint.setId(++id);
-			RelativeLayout.LayoutParams cbUPointLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbUPointLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbUPointLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbUPointLp.addRule(RelativeLayout.BELOW, topid);
 			//cbUPointLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbUPoint.setLayoutParams(cbUPointLp);
             cbUPoint.setText("U-Point");
             mainlayout.addView(cbUPoint);
+			topid = id;
 
             final CheckBox cbXL = new CheckBox(this);
             cbXL.setId(++id);
-			RelativeLayout.LayoutParams cbXLLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbXLLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbXLLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbXLLp.addRule(RelativeLayout.BELOW, topid);
 			//cbXLLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbXL.setLayoutParams(cbXLLp);
             cbXL.setText("XL");
             mainlayout.addView(cbXL);
+			topid = id;
 
             final CheckBox cbXLAirtime = new CheckBox(this);
             cbXLAirtime.setId(++id);
-			RelativeLayout.LayoutParams cbXLAirtimeLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbXLAirtimeLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbXLAirtimeLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbXLAirtimeLp.addRule(RelativeLayout.RIGHT_OF, id-1);
+			cbXLAirtimeLp.addRule(RelativeLayout.ALIGN_TOP, topid);
+			//cbXLAirtimeLp.addRule(RelativeLayout.BELOW, id-1);
 			//cbXLAirtimeLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbXLAirtime.setLayoutParams(cbXLAirtimeLp);
             cbXLAirtime.setText("XL Airtime");
@@ -175,8 +213,10 @@ public class AndroidOgreMesh extends Activity
 
             final CheckBox cbXLHrn = new CheckBox(this);
             cbXLHrn.setId(++id);
-			RelativeLayout.LayoutParams cbXLHrnLp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-			cbXLHrnLp.addRule(RelativeLayout.BELOW, id-1);
+			RelativeLayout.LayoutParams cbXLHrnLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			cbXLHrnLp.addRule(RelativeLayout.RIGHT_OF, id-1);
+			cbXLHrnLp.addRule(RelativeLayout.ALIGN_TOP, topid);
+			//cbXLHrnLp.addRule(RelativeLayout.BELOW, id-1);
 			//cbXLHrnLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbXLHrn.setLayoutParams(cbXLHrnLp);
             cbXLHrn.setText("XL HRN");
@@ -184,21 +224,23 @@ public class AndroidOgreMesh extends Activity
 
 			Button btch = new Button(this);
             btch.setId(++id);
-			RelativeLayout.LayoutParams btchlp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			RelativeLayout.LayoutParams btchlp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			btchlp.addRule(RelativeLayout.BELOW, id-1);
-			//btchlp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			btchlp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			btch.setLayoutParams(btchlp);
 			btch.setText("    SAVE    ");
 			btch.setOnClickListener(new OnClickListener(){ public void onClick(View view) {
 					boolean btopup = cbMainTopup.isChecked();
 					boolean bsmartfren = cbSmartfren.isChecked();
 					boolean bsevelin = cbSevelin.isChecked();
+					boolean batm = cbAtm.isChecked();
 					boolean batmbca = cbAtmBca.isChecked();
+					boolean batmbersama = cbAtmBersama.isChecked();
 					boolean bupoint = cbUPoint.isChecked();
 					boolean bxl = cbXL.isChecked();
 					boolean bxlairtime = cbXLAirtime.isChecked();
 					boolean bxlhrn = cbXLHrn.isChecked();
-					if(!btopup && !bsmartfren && !bsevelin && !batmbca && !bupoint && !bxl && !bxlairtime && !bxlhrn) {
+					if(!btopup && !bsmartfren && !bsevelin && !batm && !batmbca && !batmbersama && !bupoint && !bxl && !bxlairtime && !bxlhrn) {
 						Toast.makeText(getApplicationContext(), "You must checked at least one!", Toast.LENGTH_LONG).show();
 					} else {
 						SharedPreferences userDetails = PreferenceManager.getDefaultSharedPreferences(AndroidOgreMesh.this);
@@ -208,7 +250,9 @@ public class AndroidOgreMesh extends Activity
 						edit.putBoolean("topup", cbMainTopup.isChecked());
 						edit.putBoolean("smartfren", cbSmartfren.isChecked());
 						edit.putBoolean("sevelin", cbSevelin.isChecked());
+						edit.putBoolean("atm", cbAtm.isChecked());
 						edit.putBoolean("atmbca", cbAtmBca.isChecked());
+						edit.putBoolean("atmbersama", cbAtmBersama.isChecked());
 						edit.putBoolean("upoint", cbUPoint.isChecked());
 						edit.putBoolean("xl", cbXL.isChecked());
 						edit.putBoolean("xlairtime", cbXLAirtime.isChecked());
@@ -256,8 +300,16 @@ public class AndroidOgreMesh extends Activity
 		    menu.add(0, ++id, 0, "Sevelin");
 			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
 		} //`
+		if(batm) { //`
+		    menu.add(0, ++id, 0, "ATM");
+			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
+		} //`
 		if(batmbca) { //`
 		    menu.add(0, ++id, 0, "ATM BCA");
+			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
+		} //`
+		if(batmbersama) { //`
+		    menu.add(0, ++id, 0, "ATM Bersama");
 			menu.findItem(id).setIcon(android.R.drawable.ic_menu_info_details);
 		} //`
 		if(bupoint) { //`
@@ -284,12 +336,14 @@ public class AndroidOgreMesh extends Activity
 	private final int TOPUP = 1;
 	private final int TOPUP_SMARTFREN = 2;
 	private final int TOPUP_SEVELIN = 3;
-	private final int TOPUP_ATMBCA = 4;
-	private final int AIRTIME_UPOINT = 5;
-	private final int XL = 6;
-	private final int XL_AIRTIME = 7;
-	private final int XL_HRN = 8;
-	private final int LAST_RESULT = 9;
+	private final int TOPUP_ATM = 4;
+	private final int TOPUP_ATMBCA = 5;
+	private final int TOPUP_ATMBERSAMA = 6;
+	private final int AIRTIME_UPOINT = 7;
+	private final int XL = 8;
+	private final int XL_AIRTIME = 9;
+	private final int XL_HRN = 10;
+	private final int LAST_RESULT = 11;
 
     @Override public boolean onOptionsItemSelected(MenuItem item) 
 	{
@@ -302,8 +356,12 @@ public class AndroidOgreMesh extends Activity
 				initMimopay(TOPUP_SMARTFREN);
 			} else if(s.equals("Sevelin")) {
 				initMimopay(TOPUP_SEVELIN);
+			} else if(s.equals("ATM")) {
+				initMimopay(TOPUP_ATM);
 			} else if(s.equals("ATM BCA")) {
 				initMimopay(TOPUP_ATMBCA);
+			} else if(s.equals("ATM Bersama")) {
+				initMimopay(TOPUP_ATMBERSAMA);
 			} else if(s.equals("UPoint")) {
 				initMimopay(AIRTIME_UPOINT);
 			} else if(s.equals("XL")) {
@@ -423,6 +481,9 @@ public class AndroidOgreMesh extends Activity
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;
+        case TOPUP_ATM: // ATM
+			mMimopay.executeATMs();
+			break;
         case TOPUP_ATMBCA: // ATM BCA
 			altbld = new AlertDialog.Builder(AndroidOgreMesh.this);
 			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
@@ -432,16 +493,34 @@ public class AndroidOgreMesh extends Activity
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = false;
-				//mMimopay.executeTopup("atm_bca");
-				mMimopay.executeATMs();
+				mMimopay.executeATMs("atm_bca");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				//mMimopay.executeTopup("atm_bca", "50000");
-				jprintf("Not yet implemented");
+				mMimopay.executeATMs("atm_bca", "50000");
 			}});
 			alert = altbld.create();
-			alert.setTitle("ATM BCA Topup");
+			alert.setTitle("ATM BCA");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case TOPUP_ATMBERSAMA: // ATM Bersama
+			altbld = new AlertDialog.Builder(AndroidOgreMesh.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the value of mimocard is currently set to 50K. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = false;
+				mMimopay.executeATMs("atm_bersama");
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeATMs("atm_bersama", "50000");
+			}});
+			alert = altbld.create();
+			alert.setTitle("ATM Bersama");
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;
