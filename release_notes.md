@@ -1,6 +1,12 @@
 Mimopay Android SDK release notes
 ================================
 
+1.2.5
+------
+* UI improved
+* All alert words translated to bahasa
+* Add description on top up channels, including XL voucher
+
 1.2.4
 ------
 * fix BadTokenException problem
