@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+1.2.7
+------
+* All logos will be shown, even without SDCARD
+
 1.2.6
 ------
 * ATMs (BCA & Bersama) Quiet Mode is now supported

@@ -186,7 +186,7 @@ public class AndroidOgreMesh extends Activity
 			cbUPointLp.addRule(RelativeLayout.BELOW, topid);
 			//cbUPointLp.addRule(RelativeLayout.CENTER_HORIZONTAL);
 			cbUPoint.setLayoutParams(cbUPointLp);
-            cbUPoint.setText("U-Point");
+            cbUPoint.setText("UPoint");
             mainlayout.addView(cbUPoint);
 			topid = id;
 
