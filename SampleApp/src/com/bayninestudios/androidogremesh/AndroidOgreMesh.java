@@ -436,6 +436,8 @@ public class AndroidOgreMesh extends Activity
 		mMimopay.enableLog(true);
 		//mMimopay.enableGateway(true);
 
+		mQuietMode = false;
+
         switch (paymentid)
 		{
         case TOPUP: // launch topup activity
@@ -449,7 +451,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeTopup("smartfren");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
@@ -469,7 +470,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeTopup("sevelin");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
@@ -492,7 +492,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeATMs("atm_bca");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
@@ -512,7 +511,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeATMs("atm_bersama");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
@@ -532,7 +530,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeUPointAirtime();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
@@ -555,7 +552,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeXLAirtime();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
@@ -576,7 +572,6 @@ public class AndroidOgreMesh extends Activity
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = false;
 				mMimopay.executeXLHrn();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {

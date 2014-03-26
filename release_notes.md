@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+1.2.8
+------
+* Remove unused debug info
+* fix bug on XL, for android honeycomb above
+
 1.2.7
 ------
 * All logos will be shown, even without SDCARD
