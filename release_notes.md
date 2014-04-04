@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+1.2.9
+------
+* build-in UI improved
+* standardize onReturn's info, all in capital letter
+
 1.2.8
 ------
 * Remove unused debug info

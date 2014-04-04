@@ -1,0 +1,527 @@
+package com.bayninestudios.texturemodeldemo;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLSurfaceView;
+import android.opengl.GLU;
+import android.opengl.GLUtils;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.os.Handler;
+import android.os.Build;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+//import android.app.Activity;
+//import android.content.Context;
+import android.content.pm.ActivityInfo;
+//import android.opengl.GLSurfaceView;
+//import android.opengl.GLU;
+//import android.os.Bundle;
+
+import android.util.Log;
+import android.content.Intent;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import android.widget.RelativeLayout;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.TextView;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.CheckBox;
+import android.graphics.Typeface;
+import android.view.View.OnClickListener;
+import android.view.View;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
+
+import android.widget.Toast;
+
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.view.View.OnTouchListener;
+
+// java
+import java.util.ArrayList;
+
+// mimopay
+import com.mimopay.Mimopay;
+import com.mimopay.MimopayInterface;
+import com.mimopay.merchant.Merchant;
+
+import javax.crypto.Cipher;
+
+public class MainActivity extends Activity {
+	public void jprintf(String s) { Log.d("JimBas", "MainActivity: " + s); }
+
+    private GLSurfaceView mGLView;
+
+	private final int TOPUP = 1;
+	private final int SMARTFREN = 2;
+	private final int SEVELIN = 3;
+	private final int ATM = 4;
+	private final int BCA = 5;
+	private final int BERSAMA = 6;
+	private final int UPOINT = 7;
+	private final int XL = 8;
+	private final int XLAIRTIME = 9;
+	private final int XLHRN = 10;
+	private final int LASTRESULT = 11;
+
+	private final int holobluelight = 0xff33b5e5;
+	private final int holobluedark = 0xff0099cc;
+	private final int holobluebright = 0xff00ddff;
+
+	private final int TOTALMENUBTNS = 11;
+	private ImageButton mbtnPay = null;
+	private Button[] mbtnMenuBtns = null;
+	private int[] mnMenuBtns = {
+		R.id.shoplistbtntopup, R.id.shoplistbtntopupsmartfren, R.id.shoplistbtntopupsevelin,
+		R.id.shoplistbtnupoint,
+		R.id.shoplistbtnatm, R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
+		R.id.shoplistbtnxl, R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
+		R.id.shoplistbtnlastresult,
+	};
+	private int[] mnMenuBtnsInitId = {
+		TOPUP, SMARTFREN, SEVELIN,
+		UPOINT,
+		ATM, BCA, BERSAMA,
+		XL, XLAIRTIME, XLHRN,
+		LASTRESULT,
+	};
+	private View mvShop = null;
+	private boolean mbShopBtn = false;
+
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); //`
+		Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler());
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+		LayoutInflater inflater = getLayoutInflater();
+		mvShop = getLayoutInflater().inflate(R.layout.shop, null); //`
+
+		mbtnPay = (ImageButton) mvShop.findViewById(R.id.shoplistbtnpay);
+		mbtnPay.setOnTouchListener(new OnTouchListener() { @Override public boolean onTouch(View v, MotionEvent event) {
+			if(mBtnShopHandler != null) return true;
+			mbShopBtn = !mbShopBtn;
+			v.setPressed(mbShopBtn);
+			View vv = (View) mvShop.findViewById(R.id.shoplistitems);
+			if(vv != null) {
+				vv.setVisibility(mbShopBtn ? View.VISIBLE : View.GONE);
+			}
+			mBtnShopHandler = new Handler();
+			mBtnShopHandler.postDelayed(mBtnShopRunnable, 500);
+			return true;
+		}}); //`
+
+		mGLView = new ClearGLSurfaceView(this);
+		setContentView(mGLView);
+
+		mbtnMenuBtns = new Button[TOTALMENUBTNS];
+		for(int i=0;i<TOTALMENUBTNS;i++) {
+			mbtnMenuBtns[i] = (Button) mvShop.findViewById(mnMenuBtns[i]);
+			final int fi = i;
+			mbtnMenuBtns[i].setOnClickListener(new OnClickListener(){ public void onClick(View view) {
+				if(mBtnChooseHandler != null) return;
+				mnBtnChooseId = fi;
+				mBtnChooseHandler = new Handler();
+				mBtnChooseHandler.postDelayed(mBtnChooseRunnable, 500);
+			}});
+		} //`
+
+		getWindow().addContentView(mvShop, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
+	private class TopExceptionHandler implements Thread.UncaughtExceptionHandler
+	{
+		private Thread.UncaughtExceptionHandler defaultUEH;
+		TopExceptionHandler() {
+			this.defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
+		}
+		public void uncaughtException(Thread t, Throwable e) {
+			jprintf("AbnormalTermination. reason: " + e.toString());
+			//defaultUEH.uncaughtException(t, e);
+			System.exit(666);
+		}
+	}
+
+	private Handler mBtnShopHandler = null;
+	Runnable mBtnShopRunnable = new Runnable() { @Override public void run() { mBtnShopHandler = null; }};
+	private Handler mBtnChooseHandler = null;
+	private int mnBtnChooseId = 0;
+	Runnable mBtnChooseRunnable = new Runnable() { @Override public void run() { 
+		runOnUiThread(new Runnable() { public void run() {
+			jprintf("togglebutton: " + Integer.toString(mnBtnChooseId));
+			mbShopBtn = false;
+			mbtnPay.setPressed(mbShopBtn);
+			View v = (View) mvShop.findViewById(R.id.shoplistitems);
+			if(v != null) {
+				v.setVisibility(View.GONE);
+			}
+			mBtnChooseHandler = null;
+			initMimopay(mnMenuBtnsInitId[mnBtnChooseId]);
+		}});
+	}};
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+		if(mGLView != null) {
+	        mGLView.onPause();
+		}
+    }
+
+    @Override
+    protected void onResume() { //`
+        super.onResume(); //`
+		if(mGLView != null) {
+	        mGLView.onResume(); //`
+		} //`
+    }
+
+	boolean mQuietMode = false;
+	Mimopay mMimopay = null;
+	MimopayInterface mMimopayInterface = new MimopayInterface()
+	{
+		public void onReturn(String info, ArrayList<String> params)
+		{
+			String s,toastmsg = "";
+			jprintf("onReturn: " + info);
+			if(params != null) {
+				toastmsg += (info + "\n\n");
+				int i,j = params.size();
+				for(i=0;i<j;i++) {
+					s = params.get(i);
+					toastmsg += (s + "\n");
+					jprintf(String.format("[%d] %s", i, s));
+					
+				}
+				if(mQuietMode) {
+					final String ftoastmsg = toastmsg;
+					runOnUiThread(new Runnable() { public void run() {
+						Toast.makeText(getApplicationContext(), ftoastmsg, Toast.LENGTH_LONG).show();
+					}});
+				}
+			}
+		}
+	};
+
+	void initMimopay(int paymentid)
+	{
+		String emailOrUserId = "1385479814";
+		String merchantCode = "ID-0031";
+		String productName = "ID-0031-0001";
+		String transactionId = "";	// leave it empty, let the library generate it (unix timestamp)
+		String secretKeyStaging = null;
+		String secretKeyGateway = null;
+		try {
+			secretKeyStaging = Merchant.get(true, "zLdLLbLX7xi2E4zxcbGMPg==");
+			secretKeyGateway = Merchant.get(false, "5aSkczdhkk4ukFsZEHykkA==");
+		} catch(Exception e) { jprintf("e: " + e.toString()); }
+		String currency = "IDR";
+		
+		if(secretKeyStaging == null || secretKeyGateway == null) {
+			Toast.makeText(getApplicationContext(), "secretKey problem!", Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		mMimopay = new Mimopay(getApplicationContext(), emailOrUserId,
+			merchantCode, productName, transactionId, secretKeyStaging, secretKeyGateway, currency, mMimopayInterface);
+
+		AlertDialog.Builder altbld = null;
+		AlertDialog alert = null;
+		
+		mMimopay.enableLog(true);
+		//mMimopay.enableGateway(true);
+
+		mQuietMode = false;
+
+        switch (paymentid)
+		{
+        case TOPUP: // launch topup activity
+			mMimopay.executeTopup();
+			break;
+        case SMARTFREN:	// smartfren
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeTopup("smartfren");
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeTopup("smartfren", "1234567890123456");
+			}});
+			alert = altbld.create();
+			alert.setTitle("Smartfren Topup");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case SEVELIN: // sevelin
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeTopup("sevelin");
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeTopup("sevelin", "1234567890123456");
+			}});
+			alert = altbld.create();
+			alert.setTitle("Sevelin Topup");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case ATM: // ATM
+			mMimopay.executeATMs();
+			break;
+        case BCA: // ATM BCA
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the value of mimocard is currently set to 50K. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeATMs("atm_bca");
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeATMs("atm_bca", "50000");
+			}});
+			alert = altbld.create();
+			alert.setTitle("ATM BCA");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case BERSAMA: // ATM Bersama
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the value of mimocard is currently set to 50K. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeATMs("atm_bersama");
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeATMs("atm_bersama", "50000");
+			}});
+			alert = altbld.create();
+			alert.setTitle("ATM Bersama");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case UPOINT: // upoint
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the UPoint credits is currently set to 1000 and phone number is 082114078308. " +
+				"You may change them later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeUPointAirtime();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeUPointAirtime("1000", "082114078308", false);
+			}});
+			alert = altbld.create();
+			alert.setTitle("UPoint Airtime");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case XL: // XL
+			mMimopay.executeXL();
+			break;
+        case XLAIRTIME: // XL Airtime
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the XL Airtime credits is currently set to 10000 and phone number is 087771270843. " +
+				"You may change them later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeXLAirtime();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeXLAirtime("10000", "087771270843", false);
+				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
+			}});
+			alert = altbld.create();
+			alert.setTitle("XL Airtime");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case XLHRN: // XL HRN
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the voucher number (HRN) is currently set to 1234567890123456. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeXLHrn();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeXLHrn("1234567890123456");
+			}});
+			alert = altbld.create();
+			alert.setTitle("XL HRN");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+		case LASTRESULT:
+			String s = "";
+			int ires = 0;
+			String [] sarr = mMimopay.getLastResult();
+			if(sarr != null) {
+				ires = sarr.length;
+				for(int i=0;i<ires;i++) {
+					s += (sarr[i] + "\n");
+				}
+			}
+			//String toastmsg = String.format("ires=%d\ns=%s", ires, s);
+			Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+			break;
+        }
+	}
+}
+
+class ClearGLSurfaceView extends GLSurfaceView {
+    ClearRenderer mRenderer;
+    private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
+    private final float TRACKBALL_SCALE_FACTOR = 36.0f;
+    private float mPreviousX;
+    private float mPreviousY;
+	private Handler mAfterTouchHandler = null;
+
+    public ClearGLSurfaceView(Context context) {
+        super(context);
+        mRenderer = new ClearRenderer(context, this);
+        setRenderer(mRenderer);
+    }
+
+    @Override public boolean onTrackballEvent(MotionEvent e) {
+		afterTouch();
+        mRenderer.mAngleX += e.getX() * TRACKBALL_SCALE_FACTOR;
+        mRenderer.mAngleY += e.getY() * TRACKBALL_SCALE_FACTOR;
+        requestRender();
+        return true;
+    }
+
+    @Override public boolean onTouchEvent(MotionEvent e) {
+        float x = e.getX();
+        float y = e.getY();
+        switch (e.getAction()) {
+        case MotionEvent.ACTION_MOVE:
+			afterTouch();
+            float dx = x - mPreviousX;
+            float dy = y - mPreviousY;
+            mRenderer.mAngleX += dx * TOUCH_SCALE_FACTOR;
+            mRenderer.mAngleY += dy * TOUCH_SCALE_FACTOR;
+            requestRender();
+        }
+        mPreviousX = x;
+        mPreviousY = y;
+        return true;
+    }
+
+	private void afterTouch()
+	{
+		mRenderer.autoRotate = false;
+		if(mAfterTouchHandler == null) mAfterTouchHandler = new Handler();
+		mAfterTouchHandler.postDelayed(mStageRunnable, 1000);
+	}
+
+	Runnable mStageRunnable = new Runnable() { @Override public void run()
+	{
+		mRenderer.autoRotate = true;
+		mAfterTouchHandler = null;
+	}};
+}
+
+class ClearRenderer implements GLSurfaceView.Renderer {
+    private ClearGLSurfaceView view;
+    private Context context;
+    private DrawModel model;
+    //private float angleY = 0f;
+
+    public float mAngleX = 0f;
+    public float mAngleY = 0f;
+	public boolean autoRotate = true;
+
+    private int[] mTexture = new int[1];
+
+    public ClearRenderer(Context context, ClearGLSurfaceView view) {
+        this.view = view;
+        this.context = context;
+        model = new DrawModel(context, R.raw.rock);
+    }
+
+    private void loadTexture(GL10 gl, Context mContext, int mTex) {
+        gl.glGenTextures(1, mTexture, 0);
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, mTexture[0]);
+        Bitmap bitmap;
+        bitmap = BitmapFactory.decodeResource(mContext.getResources(), mTex);
+        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+        bitmap.recycle();
+    }
+
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        gl.glLoadIdentity();
+        GLU.gluPerspective(gl, 25.0f, (view.getWidth() * 1f) / view.getHeight(), 1, 100);
+        GLU.gluLookAt(gl, 0f, 0f, 12f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        gl.glEnable(GL10.GL_TEXTURE_2D);
+
+        loadTexture(gl, context, R.drawable.rock);
+
+        gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+        gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+        gl.glTexEnvx(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
+    }
+
+    public void onSurfaceChanged(GL10 gl, int w, int h) {
+        gl.glViewport(0, 0, w, h);
+    }
+
+    public void onDrawFrame(GL10 gl) {
+        //gl.glClearColor(0f, 0f, .7f, 1.0f);
+        gl.glClearColor(0f, 0f, 0f, 1.0f);
+        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        gl.glPushMatrix();
+        //gl.glRotatef(angleY, 0f, 1f, 0f);
+        gl.glRotatef(mAngleX, 0, 1, 0);
+        gl.glRotatef(mAngleY, 1, 0, 0);
+        model.draw(gl);
+        gl.glPopMatrix();
+       	//angleY += 1f;
+		if(autoRotate)
+        	mAngleX += 1f;
+    }
+}
