@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+1.3.1
+------
+* re-increase connection time-out, twice then before
+
 1.3.0
 ------
 * fix minor bug
