@@ -1,6 +1,13 @@
 Mimopay Android SDK release notes
 ================================
 
+1.3.0
+------
+* fix minor bug
+* In the sample, rename lib to libs.
+* increase connection time-out
+* remove retry
+
 1.2.9
 ------
 * build-in UI improved
