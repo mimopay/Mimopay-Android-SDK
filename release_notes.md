@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+1.3.3
+------
+* atm bersama is working now
+
 1.3.2
 ------
 * last result saved to internal
