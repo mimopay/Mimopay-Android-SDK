@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+1.3.4
+------
+* logcat other important vars for troubleshooting purpose
+* denom values, voucher codes, and phone number validation check
+
 1.3.3
 ------
 * atm bersama is working now
