@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+2.0
+------
+* improve a lot of things: it looks (UI), process speed, and size
+
 1.3.4
 ------
 * logcat other important vars for troubleshooting purpose

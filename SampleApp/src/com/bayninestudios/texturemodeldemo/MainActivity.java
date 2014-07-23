@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ import android.widget.CheckBox;
 import android.graphics.Typeface;
 import android.view.View.OnClickListener;
 import android.view.View;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 
@@ -75,42 +77,42 @@ public class MainActivity extends Activity {
 	private final int XLAIRTIME = 9;
 	private final int XLHRN = 10;
 	private final int LASTRESULT = 11;
+	private final int STAGGATE = 12;
 
 	private final int holobluelight = 0xff33b5e5;
 	private final int holobluedark = 0xff0099cc;
 	private final int holobluebright = 0xff00ddff;
 
-	private final int TOTALMENUBTNS = 11;
+	private final int TOTALMENUBTNS = 12;
 	private ImageButton mbtnPay = null;
-	private Button[] mbtnMenuBtns = null;
+	private View[] mbtnMenuBtns = null;
 	private int[] mnMenuBtns = {
 		R.id.shoplistbtntopup, R.id.shoplistbtntopupsmartfren, R.id.shoplistbtntopupsevelin,
 		R.id.shoplistbtnupoint,
 		R.id.shoplistbtnatm, R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
 		R.id.shoplistbtnxl, R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
-		R.id.shoplistbtnlastresult,
+		R.id.shoplistbtnlastresult, R.id.shoplistbtnstaggate
 	};
 	private int[] mnMenuBtnsInitId = {
 		TOPUP, SMARTFREN, SEVELIN,
 		UPOINT,
 		ATM, BCA, BERSAMA,
 		XL, XLAIRTIME, XLHRN,
-		LASTRESULT,
+		LASTRESULT, STAGGATE
 	};
 	private View mvShop = null;
 	private boolean mbShopBtn = false;
+	private boolean mbGateway = false;
 
-    /**
-     * Called when the activity is first created.
-     */
+	// Called when the activity is first created.
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); //`
+        super.onCreate(savedInstanceState);
 		Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler());
         //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		LayoutInflater inflater = getLayoutInflater();
-		mvShop = getLayoutInflater().inflate(R.layout.shop, null); //`
+		mvShop = getLayoutInflater().inflate(R.layout.shop, null);
 
 		mbtnPay = (ImageButton) mvShop.findViewById(R.id.shoplistbtnpay);
 		mbtnPay.setOnTouchListener(new OnTouchListener() { @Override public boolean onTouch(View v, MotionEvent event) {
@@ -120,18 +122,25 @@ public class MainActivity extends Activity {
 			View vv = (View) mvShop.findViewById(R.id.shoplistitems);
 			if(vv != null) {
 				vv.setVisibility(mbShopBtn ? View.VISIBLE : View.GONE);
+				if(mbShopBtn) {
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable(){@Override public void run() {
+						LinearLayout llshop = (LinearLayout) mvShop.findViewById(R.id.shoplayout);
+						llshop.getLayoutParams().width = mbtnPay.getLayoutParams().width;
+					}}, 1000);
+				}
 			}
 			mBtnShopHandler = new Handler();
 			mBtnShopHandler.postDelayed(mBtnShopRunnable, 500);
 			return true;
-		}}); //`
+		}});
 
 		mGLView = new ClearGLSurfaceView(this);
 		setContentView(mGLView);
 
-		mbtnMenuBtns = new Button[TOTALMENUBTNS];
+		mbtnMenuBtns = new View[TOTALMENUBTNS];
 		for(int i=0;i<TOTALMENUBTNS;i++) {
-			mbtnMenuBtns[i] = (Button) mvShop.findViewById(mnMenuBtns[i]);
+			mbtnMenuBtns[i] = mvShop.findViewById(mnMenuBtns[i]);
 			final int fi = i;
 			mbtnMenuBtns[i].setOnClickListener(new OnClickListener(){ public void onClick(View view) {
 				if(mBtnChooseHandler != null) return;
@@ -139,7 +148,7 @@ public class MainActivity extends Activity {
 				mBtnChooseHandler = new Handler();
 				mBtnChooseHandler.postDelayed(mBtnChooseRunnable, 500);
 			}});
-		} //`
+		}
 
 		getWindow().addContentView(mvShop, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
@@ -184,11 +193,11 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onResume() { //`
-        super.onResume(); //`
+    protected void onResume() {
+        super.onResume();
 		if(mGLView != null) {
-	        mGLView.onResume(); //`
-		} //`
+	        mGLView.onResume();
+		}
     }
 
 	boolean mQuietMode = false;
@@ -218,14 +227,30 @@ public class MainActivity extends Activity {
 		}
 	};
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Main codes of How to use Mimopay SDK.
+	//
+	// To have better understanding it is strongly recommend to refer to http://staging.mimopay.com/api documentation.
+	// Before create Mimopay object, you need to fill parameters that is described in documentation. Values that is used
+	// in this sample is our mimopay's internal test account.
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	void initMimopay(int paymentid)
 	{
-		String emailOrUserId = "1385479814";
-		String merchantCode = "ID-0031";
-		String productName = "ID-0031-0001";
-		String transactionId = "";	// leave it empty, let the library generate it (unix timestamp)
+		String emailOrUserId = "1385479814";	// this parameter is your user's unique id or user's email. Normally your app/game should have unique ID for every user
+		String merchantCode = "ID-0031";		// for this parameter, after registration to mimopay, your should received this from us
+		String productName = "ID-0031-0001";	// this parameter is also your own territory. It will be pass back to your server, either successful or an error occurs
+		String transactionId = "";				// this should be unique in every transaction. If you leave it empty, SDK will generate unique numbers based on unix timestamp
 		String secretKeyStaging = null;
 		String secretKeyGateway = null;
+
+		// You may initiate secretKeyStaging and secretKeyGateway hard-coded in your app's source code, however if this is not appropriate, you may use our
+		// encrypted secretKey to avoid it. Every registerred merchant should received two files from us, jar file and txt file. Txt file contains secretKey's encrypted-key,
+		// while the jar file contains secretKey's encrypted-value. So all you need to do is select and copy the encrypted-key from txt file, paste into Merchant.get() parameter,
+		// it will return your real secretKey.
+
 		try {
 			secretKeyStaging = Merchant.get(true, "zLdLLbLX7xi2E4zxcbGMPg==");
 			secretKeyGateway = Merchant.get(false, "5aSkczdhkk4ukFsZEHykkA==");
@@ -243,14 +268,25 @@ public class MainActivity extends Activity {
 		AlertDialog.Builder altbld = null;
 		AlertDialog alert = null;
 		
+		// enableLog is Mimopay SDK's internal log print. If set to enable, all logs will printed out in your app's log. This is very usefull in your development phase
 		mMimopay.enableLog(true);
-		//mMimopay.enableGateway(true);
+
+		// By default, the payment process will goes to staging.mimopay.com. Keep it commented out while you are still in development phase, 
+		// when you are ready to production you can un-comment it, so SDK will goes to gateway.mimopay.com
+		//
+		mMimopay.enableGateway(mbGateway);
 
 		mQuietMode = false;
 
+		// As stated in Mobile SDK documentation, it support two modes, UI and Quiet mode. UI mode methods have no
+		// parameter(s) in it while Quiet mode methods have.
+
         switch (paymentid)
 		{
-        case TOPUP: // launch topup activity
+        case TOPUP:
+			//
+			// this will launch UI mode top up activity. One or more payment channels will be shown, may not be the same every merchants
+			//
 			mMimopay.executeTopup();
 			break;
         case SMARTFREN:	// smartfren
@@ -261,10 +297,18 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				//
+				// this will launch UI mode top up activity and straight to show Smartfren channel.
+				//
 				mMimopay.executeTopup("smartfren");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
+				//
+				// Running Smartfren top up quietly (quiet mode). The running background task will straight call for Smartfren channel,
+				// and do the top up with the number that passed in the second parameter. No UI will pops up.
+				// You will notified the result via MimopayInterface.onReturn, check its 'info' string status
+				//
 				mMimopay.executeTopup("smartfren", "1234567890123456");
 			}});
 			alert = altbld.create();
@@ -280,10 +324,17 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				//
+				// UI mode for sevelin, straight to show Sevelin channel
+				// 
 				mMimopay.executeTopup("sevelin");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
+				//
+				// Running Sevelin top up quietly. You will notified the result via MimopayInterface.onReturn
+				// check its 'info' string status
+				// 
 				mMimopay.executeTopup("sevelin", "1234567890123456");
 			}});
 			alert = altbld.create();
@@ -335,7 +386,7 @@ public class MainActivity extends Activity {
         case UPOINT: // upoint
 			altbld = new AlertDialog.Builder(MainActivity.this);
 			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the UPoint credits is currently set to 1000 and phone number is 082114078308. " +
+				"In Quiet Mode, the UPoint credits is currently set to 1000 and phone number is 081219106541. " +
 				"You may change them later in this sample source code.\n" +
 				"Now, please choose which one.")
 			.setCancelable(true)
@@ -344,7 +395,7 @@ public class MainActivity extends Activity {
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeUPointAirtime("1000", "082114078308", false);
+				mMimopay.executeUPointAirtime("1000", "081541", true);
 			}});
 			alert = altbld.create();
 			alert.setTitle("UPoint Airtime");
@@ -366,7 +417,7 @@ public class MainActivity extends Activity {
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeXLAirtime("10000", "087771270843", false);
+				mMimopay.executeXLAirtime("10000", "0870843", false);
 				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
 			}});
 			alert = altbld.create();
@@ -405,6 +456,12 @@ public class MainActivity extends Activity {
 			}
 			//String toastmsg = String.format("ires=%d\ns=%s", ires, s);
 			Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+			break;
+		case STAGGATE:
+			mbGateway = !mbGateway;
+			Button btn = (Button) mbtnMenuBtns[STAGGATE-1];
+			btn.setText(mbGateway ? "Switch to Staging" : "Switch to Gateway");
+			Toast.makeText(getApplicationContext(), "SDK will points to " + (mbGateway ? "Gateway" : "Staging") + " on next transaction", Toast.LENGTH_LONG).show();
 			break;
         }
 	}
