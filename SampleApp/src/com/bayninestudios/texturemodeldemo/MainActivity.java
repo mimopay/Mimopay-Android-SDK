@@ -395,7 +395,7 @@ public class MainActivity extends Activity {
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeUPointAirtime("1000", "081541", true);
+				mMimopay.executeUPointAirtime("1000", "081219106541", false);
 			}});
 			alert = altbld.create();
 			alert.setTitle("UPoint Airtime");
@@ -417,7 +417,7 @@ public class MainActivity extends Activity {
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeXLAirtime("10000", "0870843", false);
+				mMimopay.executeXLAirtime("10000", "087771270843", false);
 				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
 			}});
 			alert = altbld.create();

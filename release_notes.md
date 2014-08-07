@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+2.1
+------
+* add some error handling for invalid phone number
+* normalizing value of amount
+
 2.0
 ------
 * improve a lot of things: it looks (UI), process speed, and size
