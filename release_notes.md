@@ -1,6 +1,14 @@
 Mimopay Android SDK release notes
 ================================
 
+2.2
+------
+* on auto SMS send, LANJUT -> Kirim SMS
+* support dual sim, by switch to stock message app, upoint & XL
+* minor bug fix on XL airtime
+* Last used phone number, user no need to re-type. It remember the last number type
+* auto disable log when switch to gateway (production)
+
 2.1
 ------
 * add some error handling for invalid phone number
