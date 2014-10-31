@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bayninestudios.texturemodeldemo"
     android:versionCode="4"
-    android:versionName="2.2" >
+    android:versionName="2.3" >
 
 	<!-- Add below to allow Mimopay activity -->
 	<uses-permission android:name="android.permission.INTERNET" />

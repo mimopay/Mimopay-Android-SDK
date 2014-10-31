@@ -1,6 +1,14 @@
 Mimopay Android SDK release notes
 ================================
 
+2.3
+------
+* now suppor custom language, see CustomLang.java
+* add mpoint airtime payment method (maxis)
+* add dpoint airtime payment method (digi)
+* several minor bug fixed
+
+
 2.2
 ------
 * on auto SMS send, LANJUT -> Kirim SMS
