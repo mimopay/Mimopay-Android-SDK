@@ -1,13 +1,16 @@
 Mimopay Android SDK release notes
 ================================
 
+2.4
+------
+* fix minor bug, on topup payment methods return
+
 2.3
 ------
 * now suppor custom language, see CustomLang.java
 * add mpoint airtime payment method (maxis)
 * add dpoint airtime payment method (digi)
 * several minor bug fixed
-
 
 2.2
 ------
