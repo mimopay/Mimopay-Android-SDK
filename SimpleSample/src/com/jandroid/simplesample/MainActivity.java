@@ -33,8 +33,9 @@ public class MainActivity extends Activity
 	private final int XL = 8;
 	private final int XLAIRTIME = 9;
 	private final int XLHRN = 10;
-	private final int LASTRESULT = 11;
-	private final int STAGGATE = 12;
+	private final int MPOINT = 11;
+	private final int LASTRESULT = 12;
+	private final int STAGGATE = 13;
 
 	private boolean mbGateway = false;
 
@@ -75,6 +76,11 @@ public class MainActivity extends Activity
 	public void onClickXl(View view) { initMimopay(XL); }
 	public void onClickXlPulsa(View view) { initMimopay(XLAIRTIME); }
 	public void onClickXlVoucher(View view) { initMimopay(XLHRN); }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MPoint
+
+	public void onClickMpoint(View view) { initMimopay(MPOINT); }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Others
@@ -323,6 +329,42 @@ public class MainActivity extends Activity
 			}});
 			alert = altbld.create();
 			alert.setTitle("XL HRN");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case MPOINT: // mpoint
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the MPoint Airtime credits is currently set to 200 and phone number is XXXXXXXX. " +
+				"You may change them later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
+				.setCancelable(true)
+				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					mMimopay.executeMPointAirtime();
+				}})
+				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					// Please note that payment methods those are in Bahasa by default, cannot be customized.
+					// Since MPoint is in English by default, you can do as below if you want to customized to other language.
+					// Please refer to CustomLang.java, it shows how all words should be managed.
+					mMimopay.setUiLanguage(CustomLang.mDutch);
+					mMimopay.executeMPointAirtime();
+				}});
+				AlertDialog aldlg = altbld.create();
+				aldlg.setTitle("Language");
+				aldlg.setIcon(android.R.drawable.stat_notify_error);
+				aldlg.show();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				mMimopay.executeMPointAirtime("200", "0126296221", false);
+				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
+			}});
+			alert = altbld.create();
+			alert.setTitle("MPoint Airtime");
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;

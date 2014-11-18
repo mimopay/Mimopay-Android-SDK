@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+2.5
+------
+* standardize all onReturn 'info' and 'params'. Please refer to the document
+
 2.4
 ------
 * fix minor bug, on topup payment methods return
