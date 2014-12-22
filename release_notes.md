@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+2.6
+------
+* add new function: executeUPointAirtime(String amount)
+* add new function: executeXLAirtime(String amount)
+
 2.5
 ------
 * standardize all onReturn 'info' and 'params'. Please refer to the document
