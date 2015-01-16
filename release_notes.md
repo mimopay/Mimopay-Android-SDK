@@ -1,6 +1,13 @@
 Mimopay Android SDK release notes
 ================================
 
+2.7
+------
+* allow dev to get the http status code or java exception status
+* bug fix on generating APIkey on the final URL
+* add 2 functions for complete payment for Digi (DPoint)
+* add filter on productName field to have safe URL
+
 2.6
 ------
 * add new function: executeUPointAirtime(String amount)

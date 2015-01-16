@@ -26,10 +26,12 @@ import android.util.Log;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -43,6 +45,7 @@ import android.graphics.drawable.StateListDrawable;
 
 import android.widget.Toast;
 
+import android.app.Dialog;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
@@ -155,6 +158,7 @@ public class MainActivity extends Activity {
 		}
 
 		getWindow().addContentView(mvShop, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		//initMimopay();
     }
 
 	private class TopExceptionHandler implements Thread.UncaughtExceptionHandler
@@ -269,9 +273,6 @@ public class MainActivity extends Activity {
 		mMimopay = new Mimopay(getApplicationContext(), emailOrUserId,
 			merchantCode, productName, transactionId, secretKeyStaging, secretKeyGateway, currency, mMimopayInterface);
 
-		AlertDialog.Builder altbld = null;
-		AlertDialog alert = null;
-		
 		// enableLog is Mimopay SDK's internal log print. If set to enable, all logs will printed out in your app's log. This is very usefull in your development phase
 		mMimopay.enableLog(true);
 
@@ -280,6 +281,9 @@ public class MainActivity extends Activity {
 		//
 		mMimopay.enableGateway(mbGateway);
 
+		AlertDialog.Builder altbld = null;
+		AlertDialog alert = null;
+		
 		mQuietMode = false;
 
 		// As stated in Mobile SDK documentation, it support two modes, UI and Quiet mode. UI mode methods have no
@@ -313,7 +317,7 @@ public class MainActivity extends Activity {
 				// and do the top up with the number that passed in the second parameter. No UI will pops up.
 				// You will notified the result via MimopayInterface.onReturn, check its 'info' string status
 				//
-				mMimopay.executeTopup("smartfren", "1234567890123456");
+				mMimopay.executeTopup("smartfren", "9861529055077264");
 			}});
 			alert = altbld.create();
 			alert.setTitle("Smartfren Topup");
@@ -400,6 +404,7 @@ public class MainActivity extends Activity {
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
 				mMimopay.executeUPointAirtime("1000", "081219106541", false);
+				//mMimopay.executeUPointAirtime("25000");
 			}});
 			alert = altbld.create();
 			alert.setTitle("UPoint Airtime");
@@ -422,6 +427,7 @@ public class MainActivity extends Activity {
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
 				mMimopay.executeXLAirtime("10000", "087771270843", false);
+				//mMimopay.executeXLAirtime("20000");
 				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
 			}});
 			alert = altbld.create();
@@ -512,9 +518,34 @@ public class MainActivity extends Activity {
 				aldlg.show();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeDPointAirtime("0", "0169041289", false);
-				//Toast.makeText(getApplicationContext(), "Quiet mode disabled for temporary", Toast.LENGTH_LONG).show();
+				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+				altbld.setMessage("Choose DPoint Payment ?")
+				.setCancelable(true)
+				.setPositiveButton("New Transaction", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					mQuietMode = true;
+					mMimopay.executeDPointAirtime("0", "0169041289", false);
+				}})
+				.setNegativeButton("Complete Last Payment", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					if(!mMimopay.isDPointPaymentIncomplete()) {
+						Toast.makeText(getApplicationContext(), "The last transaction was not DPoint payment method", Toast.LENGTH_LONG).show();
+					} else {
+						final Dialog smsdlg = new Dialog(MainActivity.this);
+						smsdlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+						smsdlg.setContentView(R.layout.digismscode);
+						Button smsdlgButton = (Button) smsdlg.findViewById(R.id.smscodeTopup);
+						smsdlgButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+							mQuietMode = true;
+							EditText edit = (EditText) smsdlg.findViewById(R.id.smscodeEditText);
+							mMimopay.completeDPointPayment(edit.getText().toString());
+							smsdlg.dismiss();
+						}});
+						smsdlg.show();
+					}
+				}});
+				AlertDialog aldlg = altbld.create();
+				aldlg.setTitle("Language");
+				aldlg.setIcon(android.R.drawable.stat_notify_error);
+				aldlg.show();
 			}});
 			alert = altbld.create();
 			alert.setTitle("DPoint Airtime");
