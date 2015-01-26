@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+2.8
+------
+* bug fixed, ErrorInvalidPhoneNumber raised because of the total digit input of phone number
+* for digi, it allow to use country code however still should not use any non-numeric character such as '+' character
+
 2.7
 ------
 * allow dev to get the http status code or java exception status
