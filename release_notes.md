@@ -1,6 +1,9 @@
 Mimopay Android SDK release notes
 ================================
 
+v2.8.1
+* minor change on displaying fixed denom on airtime and atm
+
 2.8
 ------
 * bug fixed, ErrorInvalidPhoneNumber raised because of the total digit input of phone number

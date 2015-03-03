@@ -399,7 +399,20 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeUPointAirtime();
+				//mMimopay.executeUPointAirtime();
+				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+				altbld.setMessage("Denom list or fixed denom ?")
+				.setCancelable(true)
+				.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					mMimopay.executeUPointAirtime();
+				}})
+				.setNegativeButton("Fixed Denom (1000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					mMimopay.executeUPointAirtime("1000");
+				}});
+				AlertDialog aldlg = altbld.create();
+				aldlg.setTitle("Language");
+				aldlg.setIcon(android.R.drawable.stat_notify_error);
+				aldlg.show();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
@@ -426,7 +439,7 @@ public class MainActivity extends Activity {
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeXLAirtime("10000", "087771270843", false);
+				mMimopay.executeXLAirtime("10000", "087771270843 ", false);
 				//mMimopay.executeXLAirtime("20000");
 				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
 			}});
@@ -523,7 +536,7 @@ public class MainActivity extends Activity {
 				.setCancelable(true)
 				.setPositiveButton("New Transaction", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 					mQuietMode = true;
-					mMimopay.executeDPointAirtime("0", "0169041289", false);
+					mMimopay.executeDPointAirtime("0", "60169041289", false);
 				}})
 				.setNegativeButton("Complete Last Payment", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 					if(!mMimopay.isDPointPaymentIncomplete()) {
