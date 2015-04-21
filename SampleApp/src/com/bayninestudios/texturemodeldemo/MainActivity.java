@@ -36,6 +36,8 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.CheckBox;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.graphics.Typeface;
 import android.view.View.OnClickListener;
 import android.view.View;
@@ -75,36 +77,38 @@ public class MainActivity extends Activity {
 	private final int ATM = 4;
 	private final int BCA = 5;
 	private final int BERSAMA = 6;
-	private final int UPOINT = 7;
-	private final int XL = 8;
-	private final int XLAIRTIME = 9;
-	private final int XLHRN = 10;
-	private final int MPOINT = 11;
-	private final int DPOINT = 12;
-	private final int LASTRESULT = 13;
-	private final int STAGGATE = 14;
+	private final int UPOINTHRN = 7;
+	private final int UPOINT = 8;
+	private final int XL = 9;
+	private final int XLAIRTIME = 10;
+	private final int XLHRN = 11;
+	private final int MPOINT = 12;
+	private final int DPOINT = 13;
+	private final int CELCOM = 14;
+	private final int LASTRESULT = 15;
+	private final int STAGGATE = 16;
 
 	private final int holobluelight = 0xff33b5e5;
 	private final int holobluedark = 0xff0099cc;
 	private final int holobluebright = 0xff00ddff;
 
-	private final int TOTALMENUBTNS = 14;
+	private final int TOTALMENUBTNS = 16;
 	private ImageButton mbtnPay = null;
 	private View[] mbtnMenuBtns = null;
 	private int[] mnMenuBtns = {
 		R.id.shoplistbtntopup, R.id.shoplistbtntopupsmartfren, R.id.shoplistbtntopupsevelin,
-		R.id.shoplistbtnupoint,
+		R.id.shoplistbtnupointhrn, R.id.shoplistbtnupoint,
 		R.id.shoplistbtnatm, R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
 		R.id.shoplistbtnxl, R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
-		R.id.shoplistbtnmpointairtime, R.id.shoplistbtndpointairtime,
+		R.id.shoplistbtnmpointairtime, R.id.shoplistbtndpointairtime, R.id.shoplistbtncelcom,
 		R.id.shoplistbtnlastresult, R.id.shoplistbtnstaggate
 	};
 	private int[] mnMenuBtnsInitId = {
 		TOPUP, SMARTFREN, SEVELIN,
-		UPOINT,
+		UPOINTHRN, UPOINT,
 		ATM, BCA, BERSAMA,
 		XL, XLAIRTIME, XLHRN,
-		MPOINT, DPOINT,
+		MPOINT, DPOINT, CELCOM,
 		LASTRESULT, STAGGATE
 	};
 	private View mvShop = null;
@@ -361,11 +365,11 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeATMs("atm_bca");
+				paymentATMs("atm_bca");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeATMs("atm_bca", "50000");
+				mMimopay.executeATMs("atm_bca", "100000");
 			}});
 			alert = altbld.create();
 			alert.setTitle("ATM BCA");
@@ -380,17 +384,43 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeATMs("atm_bersama");
+				paymentATMs("atm_bersama");
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
-				mMimopay.executeATMs("atm_bersama", "50000");
+				mMimopay.executeATMs("atm_bersama", "100000");
 			}});
 			alert = altbld.create();
 			alert.setTitle("ATM Bersama");
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;
+        case UPOINTHRN: // upoint hrn
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
+				"You may change it later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				//
+				// UI mode for upoint voucher, straight to show upoint voucher channel
+				// 
+				mMimopay.executeUPointHrn();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				//
+				// Running Upoint voucher top up quietly. You will notified the result via MimopayInterface.onReturn
+				// check its 'info' string status
+				// 
+				mMimopay.executeUPointHrn("1234567890123456");
+			}});
+			alert = altbld.create();
+			alert.setTitle("Upoint Voucher Topup");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+        	break;
         case UPOINT: // upoint
 			altbld = new AlertDialog.Builder(MainActivity.this);
 			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
@@ -399,25 +429,23 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				//mMimopay.executeUPointAirtime();
 				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
 				altbld.setMessage("Denom list or fixed denom ?")
 				.setCancelable(true)
 				.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 					mMimopay.executeUPointAirtime();
 				}})
-				.setNegativeButton("Fixed Denom (1000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				.setNegativeButton("Fixed Denom (IDR 1000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 					mMimopay.executeUPointAirtime("1000");
 				}});
 				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("Language");
+				aldlg.setTitle("Upoint Denom");
 				aldlg.setIcon(android.R.drawable.stat_notify_error);
 				aldlg.show();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
 				mMimopay.executeUPointAirtime("1000", "081219106541", false);
-				//mMimopay.executeUPointAirtime("25000");
 			}});
 			alert = altbld.create();
 			alert.setTitle("UPoint Airtime");
@@ -435,13 +463,23 @@ public class MainActivity extends Activity {
 				"Now, please choose which one.")
 			.setCancelable(true)
 			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeXLAirtime();
+				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+				altbld.setMessage("Denom list or fixed denom ?")
+				.setCancelable(true)
+				.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					mMimopay.executeXLAirtime();
+				}})
+				.setNegativeButton("Fixed Denom (IDR 20000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					mMimopay.executeXLAirtime("20000");
+				}});
+				AlertDialog aldlg = altbld.create();
+				aldlg.setTitle("XL Pulsa Denom");
+				aldlg.setIcon(android.R.drawable.stat_notify_error);
+				aldlg.show();
 			}})
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
 				mMimopay.executeXLAirtime("10000", "087771270843 ", false);
-				//mMimopay.executeXLAirtime("20000");
-				//Toast.makeText(getApplicationContext(), "not yet implemented", Toast.LENGTH_LONG).show();
 			}});
 			alert = altbld.create();
 			alert.setTitle("XL Airtime");
@@ -479,15 +517,14 @@ public class MainActivity extends Activity {
 				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
 				.setCancelable(true)
 				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mMimopay.executeMPointAirtime();
+					paymentMPoint();
 				}})
 				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 					// Please note that payment methods those are in Bahasa by default, cannot be customized.
 					// Since MPoint is in English by default, you can do as below if you want to customized to other language.
 					// Please refer to CustomLang.java, it shows how all words should be managed.
-					jprintf(String.format("CustomLang.mDutch:%d", CustomLang.mDutch.length));
 					mMimopay.setUiLanguage(CustomLang.mDutch);
-					mMimopay.executeMPointAirtime();
+					paymentMPoint();
 				}});
 				AlertDialog aldlg = altbld.create();
 				aldlg.setTitle("Language");
@@ -516,14 +553,14 @@ public class MainActivity extends Activity {
 				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
 				.setCancelable(true)
 				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mMimopay.executeDPointAirtime();
+					paymentDPoint();
 				}})
 				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 					// Please note that payment methods those are in Bahasa by default, cannot be customized.
 					// Since DPoint is in English by default, you can do as below if you want to customized to other language.
 					// Please refer to CustomLang.java, it shows how all words should be managed.
 					mMimopay.setUiLanguage(CustomLang.mDutch);
-					mMimopay.executeDPointAirtime();
+					paymentDPoint();
 				}});
 				AlertDialog aldlg = altbld.create();
 				aldlg.setTitle("Language");
@@ -565,6 +602,44 @@ public class MainActivity extends Activity {
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;
+        case CELCOM:
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the Celcom Airtime credits is currently set to 2 and phone number is 0193618850. " +
+				"You may change them later in this sample source code.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
+				.setCancelable(true)
+				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					paymentCelcom();
+				}})
+				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+					// Please note that payment methods those are in Bahasa by default, cannot be customized.
+					// Since Celcom is in English by default, you can do as below if you want to customized to other language.
+					// Please refer to CustomLang.java, it shows how all words should be managed.
+					jprintf(String.format("CustomLang.mDutch:%d", CustomLang.mDutch.length));
+					mMimopay.setUiLanguage(CustomLang.mDutch);
+					paymentCelcom();
+				}});
+				AlertDialog aldlg = altbld.create();
+				aldlg.setTitle("Language");
+				aldlg.setIcon(android.R.drawable.stat_notify_error);
+				aldlg.show();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+	        	mMimopay.setCurrency("MYR");
+				mMimopay.executeCelcomAirtime("1", "0193618850", false);
+				//Toast.makeText(getApplicationContext(), "Quiet mode disabled for temporary", Toast.LENGTH_LONG).show();
+			}});
+			alert = altbld.create();
+			alert.setTitle("Celcom Airtime");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
 		case LASTRESULT:
 			String s = "";
 			int ires = 0;
@@ -585,6 +660,87 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "SDK will points to " + (mbGateway ? "Gateway" : "Staging") + " on next transaction", Toast.LENGTH_LONG).show();
 			break;
         }
+	}
+
+	public void paymentATMs(final String channel)
+	{
+		AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+		altbld.setMessage("Denom list or fixed denom ?")
+		.setCancelable(true)
+		.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+			mMimopay.executeATMs(channel);
+		}})
+		.setNegativeButton("Fixed Denom (IDR 100000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+			mMimopay.setActiveATMsUI(true);
+			mMimopay.executeATMs(channel, "100000");
+		}});
+		AlertDialog aldlg = altbld.create();
+		aldlg.setTitle("ATM Denom");
+		aldlg.setIcon(android.R.drawable.stat_notify_error);
+		aldlg.show();
+	}
+
+	public void paymentMPoint()
+	{
+		if(mMimopay == null) return;
+
+		AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+		altbld.setMessage("Denom list or fixed denom ?")
+		.setCancelable(true)
+		.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+        	mMimopay.setCurrency("MYR");
+			mMimopay.executeMPointAirtime();
+		}})
+		.setNegativeButton("Fixed Denom (MYR 10)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+        	mMimopay.setCurrency("MYR");
+			mMimopay.executeMPointAirtime("10");
+		}});
+		AlertDialog aldlg = altbld.create();
+		aldlg.setTitle("MPoint Denom");
+		aldlg.setIcon(android.R.drawable.stat_notify_error);
+		aldlg.show();
+	}
+
+	public void paymentDPoint()
+	{
+		if(mMimopay == null) return;
+
+		AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+		altbld.setMessage("Denom list or fixed denom ?")
+		.setCancelable(true)
+		.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+        	mMimopay.setCurrency("MYR");
+			mMimopay.executeDPointAirtime();
+		}})
+		.setNegativeButton("Fixed Denom (MYR 5)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+        	mMimopay.setCurrency("MYR");
+			mMimopay.executeDPointAirtime("5");
+		}});
+		AlertDialog aldlg = altbld.create();
+		aldlg.setTitle("DPoint Denom");
+		aldlg.setIcon(android.R.drawable.stat_notify_error);
+		aldlg.show();
+	}
+
+	public void paymentCelcom()
+	{
+		if(mMimopay == null) return;
+
+		AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
+		altbld.setMessage("Denom list or fixed denom ?")
+		.setCancelable(true)
+		.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+        	mMimopay.setCurrency("MYR");
+			mMimopay.executeCelcomAirtime();
+		}})
+		.setNegativeButton("Fixed Denom (MYR 1)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+        	mMimopay.setCurrency("MYR");
+			mMimopay.executeCelcomAirtime("1");
+		}});
+		AlertDialog aldlg = altbld.create();
+		aldlg.setTitle("Celcom Denom");
+		aldlg.setIcon(android.R.drawable.stat_notify_error);
+		aldlg.show();
 	}
 }
 

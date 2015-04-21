@@ -1,7 +1,16 @@
 Mimopay Android SDK release notes
 ================================
 
-v2.8.1
+2.9
+------
+* new payment method, upoint voucher
+* new payment method, celcom airtime
+* add fix amount for all airtime payment
+* add atm also with fix amount
+* bug fix, exclude 10% on all non-upoint payment methods
+
+2.8.1
+------
 * minor change on displaying fixed denom on airtime and atm
 
 2.8
