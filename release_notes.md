@@ -1,6 +1,14 @@
 Mimopay Android SDK release notes
 ================================
 
+2.9.2
+------
+* add new function, executeUPointAirtime(String amount, String phoneNumber, boolean autosendsms, String upointItem)
+
+2.9.1
+------
+* make sure it use https on production
+
 2.9
 ------
 * new payment method, upoint voucher

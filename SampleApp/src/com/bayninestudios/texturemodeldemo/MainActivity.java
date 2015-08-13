@@ -212,12 +212,17 @@ public class MainActivity extends Activity {
 		}
     }
 
+    private int callCount = 0;
+    private int retCount = 0;
+
 	boolean mQuietMode = false;
 	Mimopay mMimopay = null;
 	MimopayInterface mMimopayInterface = new MimopayInterface()
 	{
 		public void onReturn(String info, ArrayList<String> params)
 		{
+			jprintf(String.format("retCount:%d info:%s params:%s", retCount++, info, params != null ? params.get(0) : "none"));
+
 			String s,toastmsg = "";
 			jprintf("onReturn: " + info);
 			if(params != null) {
@@ -253,7 +258,8 @@ public class MainActivity extends Activity {
 	{
 		String emailOrUserId = "1385479814";	// this parameter is your user's unique id or user's email. Normally your app/game should have unique ID for every user
 		String merchantCode = "ID-0031";		// for this parameter, after registration to mimopay, your should received this from us
-		String productName = "ID-0031-0001";	// this parameter is also your own territory. It will be pass back to your server, either successful or an error occurs
+		//String productName = "ID-0031-0001";	// this parameter is also your own territory. It will be pass back to your server, either successful or an error occurs
+		String productName = "10_Coins";	// this parameter is also your own territory. It will be pass back to your server, either successful or an error occurs
 		String transactionId = "";				// this should be unique in every transaction. If you leave it empty, SDK will generate unique numbers based on unix timestamp
 		String secretKeyStaging = null;
 		String secretKeyGateway = null;
@@ -292,6 +298,8 @@ public class MainActivity extends Activity {
 
 		// As stated in Mobile SDK documentation, it support two modes, UI and Quiet mode. UI mode methods have no
 		// parameter(s) in it while Quiet mode methods have.
+
+		callCount++;
 
         switch (paymentid)
 		{
@@ -446,6 +454,8 @@ public class MainActivity extends Activity {
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
 				mMimopay.executeUPointAirtime("1000", "081219106541", false);
+				// execute upoint quietly with upoint item
+				// mMimopay.executeUPointAirtime("1000", "081219106541", false, "10 diamonds");
 			}});
 			alert = altbld.create();
 			alert.setTitle("UPoint Airtime");
@@ -670,9 +680,9 @@ public class MainActivity extends Activity {
 		.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 			mMimopay.executeATMs(channel);
 		}})
-		.setNegativeButton("Fixed Denom (IDR 100000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+		.setNegativeButton("Fixed Denom (IDR 90000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 			mMimopay.setActiveATMsUI(true);
-			mMimopay.executeATMs(channel, "100000");
+			mMimopay.executeATMs(channel, "90000");
 		}});
 		AlertDialog aldlg = altbld.create();
 		aldlg.setTitle("ATM Denom");
