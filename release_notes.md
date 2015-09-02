@@ -1,6 +1,12 @@
 Mimopay Android SDK release notes
 ================================
 
+3.0
+------
+* add new payment method, Vietnam telco, VnTelco
+* improve UI look
+* add new error, ErrorChannelIsNotReady, issued when channelStatus = 0
+
 2.9.2
 ------
 * add new function, executeUPointAirtime(String amount, String phoneNumber, boolean autosendsms, String upointItem)

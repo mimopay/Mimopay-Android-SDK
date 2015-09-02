@@ -1,5 +1,6 @@
 package com.bayninestudios.texturemodeldemo;
 
+// android
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,62 +12,32 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.os.Handler;
 import android.os.Build;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
-//import android.app.Activity;
-//import android.content.Context;
-import android.content.pm.ActivityInfo;
-//import android.opengl.GLSurfaceView;
-//import android.opengl.GLU;
-//import android.os.Bundle;
-
 import android.util.Log;
-import android.content.Intent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Window;
-
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.CheckBox;
-import android.widget.RadioGroup;
-import android.widget.RadioButton;
-import android.graphics.Typeface;
-import android.view.View.OnClickListener;
 import android.view.View;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
-
 import android.widget.Toast;
-
 import android.app.Dialog;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
-
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.view.View.OnTouchListener;
 
 // java
 import java.util.ArrayList;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 // mimopay
 import com.mimopay.Mimopay;
 import com.mimopay.MimopayInterface;
 import com.mimopay.merchant.Merchant;
 
-import javax.crypto.Cipher;
-
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+{
 	public void jprintf(String s) { Log.d("JimBas", "MainActivity: " + s); }
 
     private GLSurfaceView mGLView;
@@ -85,14 +56,15 @@ public class MainActivity extends Activity {
 	private final int MPOINT = 12;
 	private final int DPOINT = 13;
 	private final int CELCOM = 14;
-	private final int LASTRESULT = 15;
-	private final int STAGGATE = 16;
+	private final int VNTELCO = 15;
+	private final int LASTRESULT = 16;
+	private final int STAGGATE = 17;
 
 	private final int holobluelight = 0xff33b5e5;
 	private final int holobluedark = 0xff0099cc;
 	private final int holobluebright = 0xff00ddff;
 
-	private final int TOTALMENUBTNS = 16;
+	private final int TOTALMENUBTNS = 17;
 	private ImageButton mbtnPay = null;
 	private View[] mbtnMenuBtns = null;
 	private int[] mnMenuBtns = {
@@ -101,6 +73,7 @@ public class MainActivity extends Activity {
 		R.id.shoplistbtnatm, R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
 		R.id.shoplistbtnxl, R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
 		R.id.shoplistbtnmpointairtime, R.id.shoplistbtndpointairtime, R.id.shoplistbtncelcom,
+		R.id.shoplistbtnvntelco,
 		R.id.shoplistbtnlastresult, R.id.shoplistbtnstaggate
 	};
 	private int[] mnMenuBtnsInitId = {
@@ -109,6 +82,7 @@ public class MainActivity extends Activity {
 		ATM, BCA, BERSAMA,
 		XL, XLAIRTIME, XLHRN,
 		MPOINT, DPOINT, CELCOM,
+		VNTELCO,
 		LASTRESULT, STAGGATE
 	};
 	private View mvShop = null;
@@ -116,17 +90,16 @@ public class MainActivity extends Activity {
 	private boolean mbGateway = false;
 
 	// Called when the activity is first created.
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+    @Override public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 		Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler());
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		LayoutInflater inflater = getLayoutInflater();
 		mvShop = getLayoutInflater().inflate(R.layout.shop, null);
 
 		mbtnPay = (ImageButton) mvShop.findViewById(R.id.shoplistbtnpay);
-		mbtnPay.setOnTouchListener(new OnTouchListener() { @Override public boolean onTouch(View v, MotionEvent event) {
+		mbtnPay.setOnTouchListener(new View.OnTouchListener() { @Override public boolean onTouch(View v, MotionEvent event) {
 			if(mBtnShopHandler != null) return true;
 			mbShopBtn = !mbShopBtn;
 			v.setPressed(mbShopBtn);
@@ -153,7 +126,7 @@ public class MainActivity extends Activity {
 		for(int i=0;i<TOTALMENUBTNS;i++) {
 			mbtnMenuBtns[i] = mvShop.findViewById(mnMenuBtns[i]);
 			final int fi = i;
-			mbtnMenuBtns[i].setOnClickListener(new OnClickListener(){ public void onClick(View view) {
+			mbtnMenuBtns[i].setOnClickListener(new View.OnClickListener(){ public void onClick(View view) {
 				if(mBtnChooseHandler != null) return;
 				mnBtnChooseId = fi;
 				mBtnChooseHandler = new Handler();
@@ -162,7 +135,6 @@ public class MainActivity extends Activity {
 		}
 
 		getWindow().addContentView(mvShop, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		//initMimopay();
     }
 
 	private class TopExceptionHandler implements Thread.UncaughtExceptionHandler
@@ -173,7 +145,6 @@ public class MainActivity extends Activity {
 		}
 		public void uncaughtException(Thread t, Throwable e) {
 			jprintf("AbnormalTermination. reason: " + e.toString());
-			//defaultUEH.uncaughtException(t, e);
 			System.exit(666);
 		}
 	}
@@ -196,16 +167,16 @@ public class MainActivity extends Activity {
 		}});
 	}};
 
-    @Override
-    protected void onPause() {
+    @Override protected void onPause()
+    {
         super.onPause();
 		if(mGLView != null) {
 	        mGLView.onPause();
 		}
     }
 
-    @Override
-    protected void onResume() {
+    @Override protected void onResume()
+    {
         super.onResume();
 		if(mGLView != null) {
 	        mGLView.onResume();
@@ -214,9 +185,9 @@ public class MainActivity extends Activity {
 
     private int callCount = 0;
     private int retCount = 0;
-
 	boolean mQuietMode = false;
 	Mimopay mMimopay = null;
+
 	MimopayInterface mMimopayInterface = new MimopayInterface()
 	{
 		public void onReturn(String info, ArrayList<String> params)
@@ -544,7 +515,6 @@ public class MainActivity extends Activity {
 			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mQuietMode = true;
 				mMimopay.executeMPointAirtime("2", "0175629621", false);
-				//Toast.makeText(getApplicationContext(), "Quiet mode disabled for temporary", Toast.LENGTH_LONG).show();
 			}});
 			alert = altbld.create();
 			alert.setTitle("MPoint Airtime");
@@ -593,7 +563,7 @@ public class MainActivity extends Activity {
 						smsdlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
 						smsdlg.setContentView(R.layout.digismscode);
 						Button smsdlgButton = (Button) smsdlg.findViewById(R.id.smscodeTopup);
-						smsdlgButton.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) {
+						smsdlgButton.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
 							mQuietMode = true;
 							EditText edit = (EditText) smsdlg.findViewById(R.id.smscodeEditText);
 							mMimopay.completeDPointPayment(edit.getText().toString());
@@ -643,10 +613,29 @@ public class MainActivity extends Activity {
 				mQuietMode = true;
 	        	mMimopay.setCurrency("MYR");
 				mMimopay.executeCelcomAirtime("1", "0193618850", false);
-				//Toast.makeText(getApplicationContext(), "Quiet mode disabled for temporary", Toast.LENGTH_LONG).show();
 			}});
 			alert = altbld.create();
 			alert.setTitle("Celcom Airtime");
+			alert.setIcon(android.R.drawable.stat_notify_error);
+			alert.show();
+			break;
+        case VNTELCO:	// Vietnam Telco
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
+				"In Quiet Mode, the all topup parameters is sets as defined in the sample " +
+				"source code. You may change it later.\n" +
+				"Now, please choose which one.")
+			.setCancelable(true)
+			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeVnTelco();
+			}})
+			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mQuietMode = true;
+				// VinaPhone => vnp, MobiFone => vms, Viettel => vte
+				mMimopay.executeVnTelco("vte", "1234567890123456", "0987654321098765", "08123456789", "anu@anu.com");
+			}});
+			alert = altbld.create();
+			alert.setTitle("Vietnam Telcos Topup");
 			alert.setIcon(android.R.drawable.stat_notify_error);
 			alert.show();
 			break;
@@ -660,7 +649,6 @@ public class MainActivity extends Activity {
 					s += (sarr[i] + "\n");
 				}
 			}
-			//String toastmsg = String.format("ires=%d\ns=%s", ires, s);
 			Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
 			break;
 		case STAGGATE:
@@ -763,13 +751,15 @@ class ClearGLSurfaceView extends GLSurfaceView
     private float mPreviousY;
 	private Handler mAfterTouchHandler = null;
 
-    public ClearGLSurfaceView(Context context) {
+    public ClearGLSurfaceView(Context context)
+    {
         super(context);
         mRenderer = new ClearRenderer(context, this);
         setRenderer(mRenderer);
     }
 
-    @Override public boolean onTrackballEvent(MotionEvent e) {
+    @Override public boolean onTrackballEvent(MotionEvent e)
+    {
 		afterTouch();
         mRenderer.mAngleX += e.getX() * TRACKBALL_SCALE_FACTOR;
         mRenderer.mAngleY += e.getY() * TRACKBALL_SCALE_FACTOR;
@@ -777,7 +767,8 @@ class ClearGLSurfaceView extends GLSurfaceView
         return true;
     }
 
-    @Override public boolean onTouchEvent(MotionEvent e) {
+    @Override public boolean onTouchEvent(MotionEvent e)
+    {
         float x = e.getX();
         float y = e.getY();
         switch (e.getAction()) {
@@ -808,7 +799,8 @@ class ClearGLSurfaceView extends GLSurfaceView
 	}};
 }
 
-class ClearRenderer implements GLSurfaceView.Renderer {
+class ClearRenderer implements GLSurfaceView.Renderer
+{
     private ClearGLSurfaceView view;
     private Context context;
     private DrawModel model;
@@ -820,13 +812,15 @@ class ClearRenderer implements GLSurfaceView.Renderer {
 
     private int[] mTexture = new int[1];
 
-    public ClearRenderer(Context context, ClearGLSurfaceView view) {
+    public ClearRenderer(Context context, ClearGLSurfaceView view)
+    {
         this.view = view;
         this.context = context;
         model = new DrawModel(context, R.raw.rock);
     }
 
-    private void loadTexture(GL10 gl, Context mContext, int mTex) {
+    private void loadTexture(GL10 gl, Context mContext, int mTex)
+    {
         gl.glGenTextures(1, mTexture, 0);
         gl.glBindTexture(GL10.GL_TEXTURE_2D, mTexture[0]);
         Bitmap bitmap;
@@ -835,7 +829,8 @@ class ClearRenderer implements GLSurfaceView.Renderer {
         bitmap.recycle();
     }
 
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+    public void onSurfaceCreated(GL10 gl, EGLConfig config)
+    {
         gl.glLoadIdentity();
         GLU.gluPerspective(gl, 25.0f, (view.getWidth() * 1f) / view.getHeight(), 1, 100);
         GLU.gluLookAt(gl, 0f, 0f, 12f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -851,11 +846,13 @@ class ClearRenderer implements GLSurfaceView.Renderer {
         gl.glTexEnvx(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_MODULATE);
     }
 
-    public void onSurfaceChanged(GL10 gl, int w, int h) {
+    public void onSurfaceChanged(GL10 gl, int w, int h)
+    {
         gl.glViewport(0, 0, w, h);
     }
 
-    public void onDrawFrame(GL10 gl) {
+    public void onDrawFrame(GL10 gl)
+    {
         //gl.glClearColor(0f, 0f, .7f, 1.0f);
         gl.glClearColor(0f, 0f, 0f, 1.0f);
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
