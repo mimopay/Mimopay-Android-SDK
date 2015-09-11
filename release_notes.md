@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+3.1
+------
+* improve UI look
+* remove ErrorChannelIsNotReady, actually it is maintenance mode
+
 3.0
 ------
 * add new payment method, Vietnam telco, VnTelco

@@ -88,6 +88,11 @@ public class MainActivity extends Activity
 	private View mvShop = null;
 	private boolean mbShopBtn = false;
 	private boolean mbGateway = false;
+	private Mimopay mMimopay = null;
+
+	private int mnBtnChooseId = 0;
+	private Handler mBtnShopHandler = null;
+	private Handler mBtnChooseHandler = null;
 
 	// Called when the activity is first created.
     @Override public void onCreate(Bundle savedInstanceState)
@@ -115,7 +120,9 @@ public class MainActivity extends Activity
 				}
 			}
 			mBtnShopHandler = new Handler();
-			mBtnShopHandler.postDelayed(mBtnShopRunnable, 500);
+			mBtnShopHandler.postDelayed(
+				new Runnable() { @Override public void run() { mBtnShopHandler = null; }},
+				500);
 			return true;
 		}});
 
@@ -130,7 +137,20 @@ public class MainActivity extends Activity
 				if(mBtnChooseHandler != null) return;
 				mnBtnChooseId = fi;
 				mBtnChooseHandler = new Handler();
-				mBtnChooseHandler.postDelayed(mBtnChooseRunnable, 500);
+				mBtnChooseHandler.postDelayed(
+					new Runnable() { @Override public void run() { 
+						jprintf("togglebutton: " + Integer.toString(mnBtnChooseId));
+						mbShopBtn = false;
+						mbtnPay.setPressed(mbShopBtn);
+						View v = (View) mvShop.findViewById(R.id.shoplistitems);
+						if(v != null) {
+							v.setVisibility(View.GONE);
+						}
+						mBtnChooseHandler = null;
+						initMimopay(mnMenuBtnsInitId[mnBtnChooseId]);
+					}},
+					500
+				);
 			}});
 		}
 
@@ -149,24 +169,6 @@ public class MainActivity extends Activity
 		}
 	}
 
-	private Handler mBtnShopHandler = null;
-	Runnable mBtnShopRunnable = new Runnable() { @Override public void run() { mBtnShopHandler = null; }};
-	private Handler mBtnChooseHandler = null;
-	private int mnBtnChooseId = 0;
-	Runnable mBtnChooseRunnable = new Runnable() { @Override public void run() { 
-		runOnUiThread(new Runnable() { public void run() {
-			jprintf("togglebutton: " + Integer.toString(mnBtnChooseId));
-			mbShopBtn = false;
-			mbtnPay.setPressed(mbShopBtn);
-			View v = (View) mvShop.findViewById(R.id.shoplistitems);
-			if(v != null) {
-				v.setVisibility(View.GONE);
-			}
-			mBtnChooseHandler = null;
-			initMimopay(mnMenuBtnsInitId[mnBtnChooseId]);
-		}});
-	}};
-
     @Override protected void onPause()
     {
         super.onPause();
@@ -183,38 +185,6 @@ public class MainActivity extends Activity
 		}
     }
 
-    private int callCount = 0;
-    private int retCount = 0;
-	boolean mQuietMode = false;
-	Mimopay mMimopay = null;
-
-	MimopayInterface mMimopayInterface = new MimopayInterface()
-	{
-		public void onReturn(String info, ArrayList<String> params)
-		{
-			jprintf(String.format("retCount:%d info:%s params:%s", retCount++, info, params != null ? params.get(0) : "none"));
-
-			String s,toastmsg = "";
-			jprintf("onReturn: " + info);
-			if(params != null) {
-				toastmsg += (info + "\n\n");
-				int i,j = params.size();
-				for(i=0;i<j;i++) {
-					s = params.get(i);
-					toastmsg += (s + "\n");
-					jprintf(String.format("[%d] %s", i, s));
-					
-				}
-				if(mQuietMode) {
-					final String ftoastmsg = toastmsg;
-					runOnUiThread(new Runnable() { public void run() {
-						Toast.makeText(getApplicationContext(), ftoastmsg, Toast.LENGTH_LONG).show();
-					}});
-				}
-			}
-		}
-	};
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Main codes of How to use Mimopay SDK.
@@ -225,7 +195,7 @@ public class MainActivity extends Activity
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void initMimopay(int paymentid)
+	private void initMimopay(int paymentid)
 	{
 		String emailOrUserId = "1385479814";	// this parameter is your user's unique id or user's email. Normally your app/game should have unique ID for every user
 		String merchantCode = "ID-0031";		// for this parameter, after registration to mimopay, your should received this from us
@@ -251,8 +221,29 @@ public class MainActivity extends Activity
 			return;
 		}
 
-		mMimopay = new Mimopay(getApplicationContext(), emailOrUserId,
-			merchantCode, productName, transactionId, secretKeyStaging, secretKeyGateway, currency, mMimopayInterface);
+		mMimopay = new Mimopay(getApplicationContext(),
+			emailOrUserId,
+			merchantCode,
+			productName,
+			transactionId, 
+			secretKeyStaging,
+			secretKeyGateway,
+			currency, 
+			new MimopayInterface() { public void onReturn(String info, ArrayList<String> params) {
+				String s,toastmsg = "";
+				jprintf("onReturn: " + info);
+				if(params != null) {
+					toastmsg += (info + "\n\n");
+					int i,j = params.size();
+					for(i=0;i<j;i++) {
+						s = params.get(i);
+						toastmsg += (s + "\n");
+						jprintf(String.format("[%d] %s", i, s));
+						
+					}
+				}
+			}}
+		);
 
 		// enableLog is Mimopay SDK's internal log print. If set to enable, all logs will printed out in your app's log. This is very usefull in your development phase
 		mMimopay.enableLog(true);
@@ -262,16 +253,9 @@ public class MainActivity extends Activity
 		//
 		mMimopay.enableGateway(mbGateway);
 
+		AlertDialog aldlg = null;
 		AlertDialog.Builder altbld = null;
-		AlertDialog alert = null;
 		
-		mQuietMode = false;
-
-		// As stated in Mobile SDK documentation, it support two modes, UI and Quiet mode. UI mode methods have no
-		// parameter(s) in it while Quiet mode methods have.
-
-		callCount++;
-
         switch (paymentid)
 		{
         case TOPUP:
@@ -281,363 +265,128 @@ public class MainActivity extends Activity
 			mMimopay.executeTopup();
 			break;
         case SMARTFREN:	// smartfren
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
-				"You may change it later in this sample source code.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				//
-				// this will launch UI mode top up activity and straight to show Smartfren channel.
-				//
-				mMimopay.executeTopup("smartfren");
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				//
-				// Running Smartfren top up quietly (quiet mode). The running background task will straight call for Smartfren channel,
-				// and do the top up with the number that passed in the second parameter. No UI will pops up.
-				// You will notified the result via MimopayInterface.onReturn, check its 'info' string status
-				//
-				mMimopay.executeTopup("smartfren", "9861529055077264");
-			}});
-			alert = altbld.create();
-			alert.setTitle("Smartfren Topup");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			//
+			// this will launch UI mode top up activity and straight to show Smartfren channel.
+			//
+			mMimopay.executeTopup("smartfren");
 			break;
         case SEVELIN: // sevelin
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
-				"You may change it later in this sample source code.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				//
-				// UI mode for sevelin, straight to show Sevelin channel
-				// 
-				mMimopay.executeTopup("sevelin");
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				//
-				// Running Sevelin top up quietly. You will notified the result via MimopayInterface.onReturn
-				// check its 'info' string status
-				// 
-				mMimopay.executeTopup("sevelin", "1234567890123456");
-			}});
-			alert = altbld.create();
-			alert.setTitle("Sevelin Topup");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			//
+			// UI mode for sevelin, straight to show Sevelin channel
+			// 
+			mMimopay.executeTopup("sevelin");
 			break;
         case ATM: // ATM
 			mMimopay.executeATMs();
 			break;
         case BCA: // ATM BCA
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the value of mimocard is currently set to 50K. " +
-				"You may change it later in this sample source code.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				paymentATMs("atm_bca");
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeATMs("atm_bca", "100000");
-			}});
-			alert = altbld.create();
-			alert.setTitle("ATM BCA");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			paymentATMs("atm_bca");
 			break;
         case BERSAMA: // ATM Bersama
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the value of mimocard is currently set to 50K. " +
-				"You may change it later in this sample source code.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				paymentATMs("atm_bersama");
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeATMs("atm_bersama", "100000");
-			}});
-			alert = altbld.create();
-			alert.setTitle("ATM Bersama");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			paymentATMs("atm_bersama");
 			break;
         case UPOINTHRN: // upoint hrn
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the voucher number is currently set to 1234567890123456. " +
-				"You may change it later in this sample source code.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				//
-				// UI mode for upoint voucher, straight to show upoint voucher channel
-				// 
-				mMimopay.executeUPointHrn();
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				//
-				// Running Upoint voucher top up quietly. You will notified the result via MimopayInterface.onReturn
-				// check its 'info' string status
-				// 
-				mMimopay.executeUPointHrn("1234567890123456");
-			}});
-			alert = altbld.create();
-			alert.setTitle("Upoint Voucher Topup");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			//
+			// UI mode for upoint voucher, straight to show upoint voucher channel
+			// 
+			mMimopay.executeUPointHrn();
         	break;
         case UPOINT: // upoint
 			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the UPoint credits is currently set to 1000 and phone number is 081219106541. " +
-				"You may change them later in this sample source code.\n" +
-				"Now, please choose which one.")
+			altbld.setMessage("Denom list or fixed denom ?")
 			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
-				altbld.setMessage("Denom list or fixed denom ?")
-				.setCancelable(true)
-				.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mMimopay.executeUPointAirtime();
-				}})
-				.setNegativeButton("Fixed Denom (IDR 1000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mMimopay.executeUPointAirtime("1000");
-				}});
-				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("Upoint Denom");
-				aldlg.setIcon(android.R.drawable.stat_notify_error);
-				aldlg.show();
+			.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeUPointAirtime();
 			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeUPointAirtime("1000", "081219106541", false);
-				// execute upoint quietly with upoint item
-				// mMimopay.executeUPointAirtime("1000", "081219106541", false, "10 diamonds");
+			.setNegativeButton("Fixed Denom (IDR 1000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeUPointAirtime("1000");
 			}});
-			alert = altbld.create();
-			alert.setTitle("UPoint Airtime");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			aldlg = altbld.create();
+			aldlg.setTitle("Upoint Denom");
+			aldlg.setIcon(android.R.drawable.stat_notify_error);
+			aldlg.show();
 			break;
         case XL: // XL
 			mMimopay.executeXL();
 			break;
         case XLAIRTIME: // XL Airtime
 			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the XL Airtime credits is currently set to 10000 and phone number is 087771270843. " +
-				"You may change them later in this sample source code.\n" +
-				"Now, please choose which one.")
+			altbld.setMessage("Denom list or fixed denom ?")
 			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
-				altbld.setMessage("Denom list or fixed denom ?")
-				.setCancelable(true)
-				.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mMimopay.executeXLAirtime();
-				}})
-				.setNegativeButton("Fixed Denom (IDR 20000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mMimopay.executeXLAirtime("20000");
-				}});
-				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("XL Pulsa Denom");
-				aldlg.setIcon(android.R.drawable.stat_notify_error);
-				aldlg.show();
+			.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeXLAirtime();
 			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeXLAirtime("10000", "087771270843 ", false);
+			.setNegativeButton("Fixed Denom (IDR 20000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeXLAirtime("20000");
 			}});
-			alert = altbld.create();
-			alert.setTitle("XL Airtime");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			aldlg = altbld.create();
+			aldlg.setTitle("XL Pulsa Denom");
+			aldlg.setIcon(android.R.drawable.stat_notify_error);
+			aldlg.show();
 			break;
         case XLHRN: // XL HRN
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the voucher number (HRN) is currently set to 1234567890123456. " +
-				"You may change it later in this sample source code.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeXLHrn();
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeXLHrn("1234567890123456");
-			}});
-			alert = altbld.create();
-			alert.setTitle("XL HRN");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			mMimopay.executeXLHrn();
 			break;
         case MPOINT: // mpoint
 			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the MPoint Airtime credits is currently set to 2 and phone number is 0175629621. " +
-				"You may change them later in this sample source code.\n" +
-				"Now, please choose which one.")
+			altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
 			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
-				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
-				.setCancelable(true)
-				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					paymentMPoint();
-				}})
-				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					// Please note that payment methods those are in Bahasa by default, cannot be customized.
-					// Since MPoint is in English by default, you can do as below if you want to customized to other language.
-					// Please refer to CustomLang.java, it shows how all words should be managed.
-					mMimopay.setUiLanguage(CustomLang.mDutch);
-					paymentMPoint();
-				}});
-				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("Language");
-				aldlg.setIcon(android.R.drawable.stat_notify_error);
-				aldlg.show();
+			.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				paymentMPoint();
 			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				mMimopay.executeMPointAirtime("2", "0175629621", false);
+			.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				// Please note that payment methods those are in Bahasa by default, cannot be customized.
+				// Since MPoint is in English by default, you can do as below if you want to customized to other language.
+				// Please refer to CustomLang.java, it shows how all words should be managed.
+				mMimopay.setUiLanguage(CustomLang.mDutch);
+				paymentMPoint();
 			}});
-			alert = altbld.create();
-			alert.setTitle("MPoint Airtime");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			aldlg = altbld.create();
+			aldlg.setTitle("Maxis MPoint");
+			aldlg.setIcon(android.R.drawable.stat_notify_error);
+			aldlg.show();
 			break;
         case DPOINT: // dpoint
 			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the DPoint Airtime credits is currently set to 200 and phone number is 0169041289. " +
-				"You may change them later in this sample source code.\n" +
-				"Now, please choose which one.")
+			altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
 			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
-				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
-				.setCancelable(true)
-				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					paymentDPoint();
-				}})
-				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					// Please note that payment methods those are in Bahasa by default, cannot be customized.
-					// Since DPoint is in English by default, you can do as below if you want to customized to other language.
-					// Please refer to CustomLang.java, it shows how all words should be managed.
-					mMimopay.setUiLanguage(CustomLang.mDutch);
-					paymentDPoint();
-				}});
-				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("Language");
-				aldlg.setIcon(android.R.drawable.stat_notify_error);
-				aldlg.show();
+			.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				paymentDPoint();
 			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
-				altbld.setMessage("Choose DPoint Payment ?")
-				.setCancelable(true)
-				.setPositiveButton("New Transaction", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					mQuietMode = true;
-					mMimopay.executeDPointAirtime("0", "60169041289", false);
-				}})
-				.setNegativeButton("Complete Last Payment", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					if(!mMimopay.isDPointPaymentIncomplete()) {
-						Toast.makeText(getApplicationContext(), "The last transaction was not DPoint payment method", Toast.LENGTH_LONG).show();
-					} else {
-						final Dialog smsdlg = new Dialog(MainActivity.this);
-						smsdlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
-						smsdlg.setContentView(R.layout.digismscode);
-						Button smsdlgButton = (Button) smsdlg.findViewById(R.id.smscodeTopup);
-						smsdlgButton.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) {
-							mQuietMode = true;
-							EditText edit = (EditText) smsdlg.findViewById(R.id.smscodeEditText);
-							mMimopay.completeDPointPayment(edit.getText().toString());
-							smsdlg.dismiss();
-						}});
-						smsdlg.show();
-					}
-				}});
-				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("Language");
-				aldlg.setIcon(android.R.drawable.stat_notify_error);
-				aldlg.show();
+			.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				// Please note that payment methods those are in Bahasa by default, cannot be customized.
+				// Since DPoint is in English by default, you can do as below if you want to customized to other language.
+				// Please refer to CustomLang.java, it shows how all words should be managed.
+				mMimopay.setUiLanguage(CustomLang.mDutch);
+				paymentDPoint();
 			}});
-			alert = altbld.create();
-			alert.setTitle("DPoint Airtime");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			aldlg = altbld.create();
+			aldlg.setTitle("Language");
+			aldlg.setIcon(android.R.drawable.stat_notify_error);
+			aldlg.show();
 			break;
         case CELCOM:
 			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the Celcom Airtime credits is currently set to 2 and phone number is 0193618850. " +
-				"You may change them later in this sample source code.\n" +
-				"Now, please choose which one.")
+			altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
 			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
-				altbld.setMessage("Choose your language ?\n(Dutch language here just an example)")
-				.setCancelable(true)
-				.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					paymentCelcom();
-				}})
-				.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-					// Please note that payment methods those are in Bahasa by default, cannot be customized.
-					// Since Celcom is in English by default, you can do as below if you want to customized to other language.
-					// Please refer to CustomLang.java, it shows how all words should be managed.
-					jprintf(String.format("CustomLang.mDutch:%d", CustomLang.mDutch.length));
-					mMimopay.setUiLanguage(CustomLang.mDutch);
-					paymentCelcom();
-				}});
-				AlertDialog aldlg = altbld.create();
-				aldlg.setTitle("Language");
-				aldlg.setIcon(android.R.drawable.stat_notify_error);
-				aldlg.show();
+			.setPositiveButton("English", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				paymentCelcom();
 			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-	        	mMimopay.setCurrency("MYR");
-				mMimopay.executeCelcomAirtime("1", "0193618850", false);
+			.setNegativeButton("Dutch", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				// Please note that payment methods those are in Bahasa by default, cannot be customized.
+				// Since Celcom is in English by default, you can do as below if you want to customized to other language.
+				// Please refer to CustomLang.java, it shows how all words should be managed.
+				jprintf(String.format("CustomLang.mDutch:%d", CustomLang.mDutch.length));
+				mMimopay.setUiLanguage(CustomLang.mDutch);
+				paymentCelcom();
 			}});
-			alert = altbld.create();
-			alert.setTitle("Celcom Airtime");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			aldlg = altbld.create();
+			aldlg.setTitle("Language");
+			aldlg.setIcon(android.R.drawable.stat_notify_error);
+			aldlg.show();
 			break;
         case VNTELCO:	// Vietnam Telco
-			altbld = new AlertDialog.Builder(MainActivity.this);
-			altbld.setMessage("Mimopay's SDK supports both, Default UI and Quiet Mode. " +
-				"In Quiet Mode, the all topup parameters is sets as defined in the sample " +
-				"source code. You may change it later.\n" +
-				"Now, please choose which one.")
-			.setCancelable(true)
-			.setPositiveButton("UI", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeVnTelco();
-			}})
-			.setNegativeButton("Quiet", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mQuietMode = true;
-				// VinaPhone => vnp, MobiFone => vms, Viettel => vte
-				mMimopay.executeVnTelco("vte", "1234567890123456", "0987654321098765", "08123456789", "anu@anu.com");
-			}});
-			alert = altbld.create();
-			alert.setTitle("Vietnam Telcos Topup");
-			alert.setIcon(android.R.drawable.stat_notify_error);
-			alert.show();
+			mMimopay.executeVnTelco();
 			break;
 		case LASTRESULT:
 			String s = "";
@@ -660,7 +409,7 @@ public class MainActivity extends Activity
         }
 	}
 
-	public void paymentATMs(final String channel)
+	private void paymentATMs(final String channel)
 	{
 		AlertDialog.Builder altbld = new AlertDialog.Builder(MainActivity.this);
 		altbld.setMessage("Denom list or fixed denom ?")
@@ -678,7 +427,7 @@ public class MainActivity extends Activity
 		aldlg.show();
 	}
 
-	public void paymentMPoint()
+	private void paymentMPoint()
 	{
 		if(mMimopay == null) return;
 
@@ -699,7 +448,7 @@ public class MainActivity extends Activity
 		aldlg.show();
 	}
 
-	public void paymentDPoint()
+	private void paymentDPoint()
 	{
 		if(mMimopay == null) return;
 
@@ -720,7 +469,7 @@ public class MainActivity extends Activity
 		aldlg.show();
 	}
 
-	public void paymentCelcom()
+	private void paymentCelcom()
 	{
 		if(mMimopay == null) return;
 
