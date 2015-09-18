@@ -42,47 +42,40 @@ public class MainActivity extends Activity
 
     private GLSurfaceView mGLView;
 
-	private final int TOPUP = 1;
-	private final int SMARTFREN = 2;
-	private final int SEVELIN = 3;
-	private final int ATM = 4;
-	private final int BCA = 5;
-	private final int BERSAMA = 6;
-	private final int UPOINTHRN = 7;
-	private final int UPOINT = 8;
-	private final int XL = 9;
-	private final int XLAIRTIME = 10;
-	private final int XLHRN = 11;
-	private final int MPOINT = 12;
-	private final int DPOINT = 13;
-	private final int CELCOM = 14;
-	private final int VNTELCO = 15;
-	private final int LASTRESULT = 16;
-	private final int STAGGATE = 17;
+	private final int SMARTFREN = 1;
+	private final int SEVELIN = 2;
+	private final int BCA = 3;
+	private final int BERSAMA = 4;
+	private final int UPOINTHRN = 5;
+	private final int UPOINT = 6;
+	private final int XLAIRTIME = 7;
+	private final int XLHRN = 8;
+	private final int MPOINT = 9;
+	private final int DPOINT = 10;
+	private final int CELCOM = 11;
+	private final int VNTELCO = 12;
+	private final int LASTRESULT = 13;
+	private final int STAGGATE = 14;
 
-	private final int holobluelight = 0xff33b5e5;
-	private final int holobluedark = 0xff0099cc;
-	private final int holobluebright = 0xff00ddff;
-
-	private final int TOTALMENUBTNS = 17;
+	private final int TOTALMENUBTNS = 14;
 	private ImageButton mbtnPay = null;
 	private View[] mbtnMenuBtns = null;
 	private int[] mnMenuBtns = {
-		R.id.shoplistbtntopup, R.id.shoplistbtntopupsmartfren, R.id.shoplistbtntopupsevelin,
+		R.id.shoplistbtntopupsmartfren, R.id.shoplistbtntopupsevelin,
 		R.id.shoplistbtnupointhrn, R.id.shoplistbtnupoint,
-		R.id.shoplistbtnatm, R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
-		R.id.shoplistbtnxl, R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
+		R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
+		R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
 		R.id.shoplistbtnmpointairtime, R.id.shoplistbtndpointairtime, R.id.shoplistbtncelcom,
 		R.id.shoplistbtnvntelco,
 		R.id.shoplistbtnlastresult, R.id.shoplistbtnstaggate
 	};
 	private int[] mnMenuBtnsInitId = {
-		TOPUP, SMARTFREN, SEVELIN,
+		SMARTFREN, SEVELIN,
 		UPOINTHRN, UPOINT,
-		ATM, BCA, BERSAMA,
-		XL, XLAIRTIME, XLHRN,
-		MPOINT, DPOINT, CELCOM,
-		VNTELCO,
+		BCA, BERSAMA,
+		XLAIRTIME, XLHRN,
+		MPOINT, DPOINT,
+		CELCOM, VNTELCO,
 		LASTRESULT, STAGGATE
 	};
 	private View mvShop = null;
@@ -258,12 +251,6 @@ public class MainActivity extends Activity
 		
         switch (paymentid)
 		{
-        case TOPUP:
-			//
-			// this will launch UI mode top up activity. One or more payment channels will be shown, may not be the same every merchants
-			//
-			mMimopay.executeTopup();
-			break;
         case SMARTFREN:	// smartfren
 			//
 			// this will launch UI mode top up activity and straight to show Smartfren channel.
@@ -275,9 +262,6 @@ public class MainActivity extends Activity
 			// UI mode for sevelin, straight to show Sevelin channel
 			// 
 			mMimopay.executeTopup("sevelin");
-			break;
-        case ATM: // ATM
-			mMimopay.executeATMs();
 			break;
         case BCA: // ATM BCA
 			paymentATMs("atm_bca");
@@ -305,9 +289,6 @@ public class MainActivity extends Activity
 			aldlg.setTitle("Upoint Denom");
 			aldlg.setIcon(android.R.drawable.stat_notify_error);
 			aldlg.show();
-			break;
-        case XL: // XL
-			mMimopay.executeXL();
 			break;
         case XLAIRTIME: // XL Airtime
 			altbld = new AlertDialog.Builder(MainActivity.this);
@@ -418,7 +399,6 @@ public class MainActivity extends Activity
 			mMimopay.executeATMs(channel);
 		}})
 		.setNegativeButton("Fixed Denom (IDR 90000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-			mMimopay.setActiveATMsUI(true);
 			mMimopay.executeATMs(channel, "90000");
 		}});
 		AlertDialog aldlg = altbld.create();

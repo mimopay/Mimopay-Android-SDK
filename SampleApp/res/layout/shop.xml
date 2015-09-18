@@ -37,20 +37,6 @@
 			android:orientation="vertical"
 			>
 			<LinearLayout android:layout_width="match_parent" android:layout_height="5dp" />
-			<Button
-				android:id="@+id/shoplistbtntopup"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:text=" TOP-UP "
-				android:textSize="14sp"
-				android:textColor="#bf202020"
-				android:gravity="left|center"
-				android:background="@drawable/btnbkgnd"
-				android:layout_marginTop="5dp"
-				android:layout_marginBottom="1dp"
-				android:layout_marginLeft="3dp"
-				android:layout_marginRight="10dp"
-			/>
 			<ImageButton
 				android:id="@+id/shoplistbtntopupsmartfren"
 				android:layout_width="match_parent"
@@ -107,20 +93,6 @@
 				android:scaleType="fitCenter"
 				android:src="@drawable/upoint"
 			/>
-			<Button
-				android:id="@+id/shoplistbtnatm"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:text=" ATM "
-				android:textSize="14sp"
-				android:textColor="#bf202020"
-				android:gravity="left|center"
-				android:background="@drawable/btnbkgnd"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="1dp"
-				android:layout_marginLeft="3dp"
-				android:layout_marginRight="10dp"
-			/>
 			<ImageButton
 				android:id="@+id/shoplistbtnatmbca"
 				android:layout_width="match_parent"
@@ -148,20 +120,6 @@
 				android:adjustViewBounds="true"
 				android:scaleType="fitCenter"
 				android:src="@drawable/atmbersama"
-			/>
-			<Button
-				android:id="@+id/shoplistbtnxl"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:text=" XL "
-				android:textSize="14sp"
-				android:textColor="#bf202020"
-				android:gravity="left|center"
-				android:background="@drawable/btnbkgnd"
-				android:layout_marginTop="10dp"
-				android:layout_marginBottom="1dp"
-				android:layout_marginLeft="3dp"
-				android:layout_marginRight="10dp"
 			/>
 			<ImageButton
 				android:id="@+id/shoplistbtnxlairtime"

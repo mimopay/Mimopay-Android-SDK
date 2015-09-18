@@ -1,6 +1,12 @@
 Mimopay Android SDK release notes
 ================================
 
+3.2
+------
+* re-improve UI look. all logo not used anymore
+* improved speed
+* fix minor bug on vietnam telco payment method
+
 3.1
 ------
 * improve UI look
