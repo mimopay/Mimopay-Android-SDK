@@ -1,6 +1,10 @@
 Mimopay Android SDK release notes
 ================================
 
+3.2.1
+------
+* fix minor bug on tsel upoint
+
 3.2
 ------
 * re-improve UI look. all logo not used anymore
