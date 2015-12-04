@@ -50,21 +50,22 @@ public class MainActivity extends Activity
 	private final int UPOINT = 6;
 	private final int XLAIRTIME = 7;
 	private final int XLHRN = 8;
-	private final int MPOINT = 9;
-	private final int DPOINT = 10;
-	private final int CELCOM = 11;
-	private final int VNTELCO = 12;
-	private final int LASTRESULT = 13;
-	private final int STAGGATE = 14;
+	private final int INDOSAT = 9;
+	private final int MPOINT = 10;
+	private final int DPOINT = 11;
+	private final int CELCOM = 12;
+	private final int VNTELCO = 13;
+	private final int LASTRESULT = 14;
+	private final int STAGGATE = 15;
 
-	private final int TOTALMENUBTNS = 14;
+	private final int TOTALMENUBTNS = 15;
 	private ImageButton mbtnPay = null;
 	private View[] mbtnMenuBtns = null;
 	private int[] mnMenuBtns = {
 		R.id.shoplistbtntopupsmartfren, R.id.shoplistbtntopupsevelin,
 		R.id.shoplistbtnupointhrn, R.id.shoplistbtnupoint,
 		R.id.shoplistbtnatmbca, R.id.shoplistbtnatmbersama,
-		R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher,
+		R.id.shoplistbtnxlairtime, R.id.shoplistbtnxlvoucher, R.id.shoplistbtnindosat,
 		R.id.shoplistbtnmpointairtime, R.id.shoplistbtndpointairtime, R.id.shoplistbtncelcom,
 		R.id.shoplistbtnvntelco,
 		R.id.shoplistbtnlastresult, R.id.shoplistbtnstaggate
@@ -73,7 +74,7 @@ public class MainActivity extends Activity
 		SMARTFREN, SEVELIN,
 		UPOINTHRN, UPOINT,
 		BCA, BERSAMA,
-		XLAIRTIME, XLHRN,
+		XLAIRTIME, XLHRN, INDOSAT,
 		MPOINT, DPOINT,
 		CELCOM, VNTELCO,
 		LASTRESULT, STAGGATE
@@ -307,6 +308,21 @@ public class MainActivity extends Activity
 			break;
         case XLHRN: // XL HRN
 			mMimopay.executeXLHrn();
+			break;
+        case INDOSAT: // indosat airtime
+			altbld = new AlertDialog.Builder(MainActivity.this);
+			altbld.setMessage("Denom list or fixed denom ?")
+			.setCancelable(true)
+			.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeIndosatAirtime();
+			}})
+			.setNegativeButton("Fixed Denom (IDR 11000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeIndosatAirtime("11000");
+			}});
+			aldlg = altbld.create();
+			aldlg.setTitle("Indosat Pulsa Denom");
+			aldlg.setIcon(android.R.drawable.stat_notify_error);
+			aldlg.show();
 			break;
         case MPOINT: // mpoint
 			altbld = new AlertDialog.Builder(MainActivity.this);

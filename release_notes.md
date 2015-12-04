@@ -1,6 +1,11 @@
 Mimopay Android SDK release notes
 ================================
 
+3.2.2
+------
+* fix dpoint on receiving sms shortcode
+* add new payment method indosat airtime
+
 3.2.1
 ------
 * fix minor bug on tsel upoint
