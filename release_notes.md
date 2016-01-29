@@ -1,6 +1,16 @@
 Mimopay Android SDK release notes
 ================================
 
+v3.2.3
+------
+* additional return info, at index-4, payment submit stage
+* fix layout
+* add denom amount. denomAmount just for show, but keep submit denomValue
+* add disclaimer info from backend
+* fix error message sentences. remove the extra technical info like: length=0 index=0
+* fix bug on enableGateway on the first initialization
+* dynamic UP. now can be updated on backend
+
 3.2.2
 ------
 * fix dpoint on receiving sms shortcode

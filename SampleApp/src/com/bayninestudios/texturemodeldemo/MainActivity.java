@@ -239,13 +239,14 @@ public class MainActivity extends Activity
 			}}
 		);
 
-		// enableLog is Mimopay SDK's internal log print. If set to enable, all logs will printed out in your app's log. This is very usefull in your development phase
-		mMimopay.enableLog(true);
-
 		// By default, the payment process will goes to staging.mimopay.com. Keep it commented out while you are still in development phase, 
 		// when you are ready to production you can un-comment it, so SDK will goes to gateway.mimopay.com
 		//
-		mMimopay.enableGateway(mbGateway);
+		//mMimopay.enableGateway(mbGateway);
+
+		// enableLog is Mimopay SDK's internal log print. If set to enable, all logs will printed out in your app's log. This is very usefull in your development phase
+		// please note: 'enableGateway(true)' will disable the log once called, if you still want to see the log while in production, then you need to re-call 'enableLog(true)'
+		mMimopay.enableLog(true);
 
 		AlertDialog aldlg = null;
 		AlertDialog.Builder altbld = null;
@@ -316,8 +317,8 @@ public class MainActivity extends Activity
 			.setPositiveButton("Denom List", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
 				mMimopay.executeIndosatAirtime();
 			}})
-			.setNegativeButton("Fixed Denom (IDR 11000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
-				mMimopay.executeIndosatAirtime("11000");
+			.setNegativeButton("Fixed Denom (IDR 10000)", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) {
+				mMimopay.executeIndosatAirtime("10000");
 			}});
 			aldlg = altbld.create();
 			aldlg.setTitle("Indosat Pulsa Denom");
