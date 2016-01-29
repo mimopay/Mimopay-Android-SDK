@@ -2,7 +2,7 @@ Mimopay Android SDK release notes
 ================================
 
 v3.2.3
-------
+-------
 * additional return info, at index-4, payment submit stage
 * fix layout
 * add denom amount. denomAmount just for show, but keep submit denomValue
