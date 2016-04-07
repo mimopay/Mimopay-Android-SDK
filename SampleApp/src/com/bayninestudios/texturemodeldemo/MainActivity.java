@@ -288,7 +288,7 @@ public class MainActivity extends Activity
 				mMimopay.executeUPointAirtime("1000");
 			}});
 			aldlg = altbld.create();
-			aldlg.setTitle("Upoint Denom");
+			aldlg.setTitle("Telkomsel Denom");
 			aldlg.setIcon(android.R.drawable.stat_notify_error);
 			aldlg.show();
 			break;
