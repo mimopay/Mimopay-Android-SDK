@@ -94,6 +94,20 @@
 				android:src="@drawable/upoint"
 			/>
 			<ImageButton
+				android:id="@+id/shoplistbtnindosat"
+				android:layout_width="match_parent"
+				android:layout_height="64dp"
+				android:layout_marginTop="1dp"
+				android:layout_marginBottom="1dp"
+				android:layout_marginLeft="3dp"
+				android:layout_marginRight="10dp"
+				android:gravity="center"
+				android:background="@drawable/btnbkgnd"
+				android:adjustViewBounds="true"
+				android:scaleType="fitCenter"
+				android:src="@drawable/indosat"
+				/>
+			<ImageButton
 				android:id="@+id/shoplistbtnatmbca"
 				android:layout_width="match_parent"
 				android:layout_height="64dp"
