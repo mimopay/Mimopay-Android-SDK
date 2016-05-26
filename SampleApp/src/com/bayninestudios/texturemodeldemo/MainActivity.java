@@ -361,7 +361,7 @@ public class MainActivity extends Activity {
 				break;
 			case TRI: // tri airtime
 				altbld = new AlertDialog.Builder(MainActivity.this);
-               /* altbld.setMessage("Denom list or fixed denom ?")
+                altbld.setMessage("Denom list or fixed denom ?")
                         .setCancelable(true)
                         .setPositiveButton("Denom List", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -372,14 +372,7 @@ public class MainActivity extends Activity {
                             public void onClick(DialogInterface dialog, int id) {
                                 mMimopay.executeTriAirtime("10000");
                             }
-                        });*/
-				altbld.setMessage("Coming Soon")
-						.setCancelable(true)
-						.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
+                        });
 				aldlg = altbld.create();
 				aldlg.setTitle("Tri Pulsa Denom");
 				aldlg.setIcon(android.R.drawable.stat_notify_error);
