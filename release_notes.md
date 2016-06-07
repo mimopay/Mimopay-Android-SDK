@@ -1,6 +1,16 @@
 Mimopay Android SDK release notes
 ================================
 
+v3.2.5
+-------
+* add new payment method, Tri Airtime
+
+v3.2.4
+-------
+* add new payment method, Indosat Airtime
+* fix bugs on XL payment method
+* change wordings
+
 v3.2.3
 -------
 * additional return info, at index-4, payment submit stage
